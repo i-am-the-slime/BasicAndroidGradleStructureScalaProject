@@ -1,23 +1,20 @@
 package co.aryaapp.journal
 
 import android.support.v4.app.{Fragment, FragmentManager, FragmentPagerAdapter}
-import co.aryaapp.journal.fragments.{WhatAreYouThinkingFragment, HowDidYourBodyReactFragment, WhatHappenedFragment, HowAreYouFeelingFragment}
+import co.aryaapp.journal.fragments._
 
 class JournalPagerAdapter(fm: FragmentManager) extends FragmentPagerAdapter(fm) {
 
-  override def getCount: Int = 4
+  val fragments = Seq(
+    () => new HowAreYouFeelingFragment
+    ,() => new WhatHappenedFragment
+    ,() => new HowDidYouReactFragment
+    ,() => new HowDidYourBodyReactFragment
+    ,() => new WhatAreYouThinkingFragment
+    ,() => new DoneFragment
+  )
 
-  lazy val one = new HowAreYouFeelingFragment
-  lazy val two = new WhatHappenedFragment
-  lazy val three = new HowDidYourBodyReactFragment
-  lazy val four = new WhatAreYouThinkingFragment
+  override def getCount: Int = fragments.length
 
-  override def getItem(position: Int): Fragment = {
-    position match {
-      case 0 => one
-      case 1 => two
-      case 2 => three
-      case 3 => four
-    }
-  }
+  override def getItem(position: Int): Fragment = fragments(position)()
 }

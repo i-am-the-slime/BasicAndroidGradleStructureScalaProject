@@ -9,12 +9,14 @@ import co.aryaapp.helpers._
 import AndroidConversions._
 import TypedResource._
 
-class HowAreYouFeelingFragment extends JournalBaseFragment {
+class HowAreYouFeelingFragment extends
+  JournalBaseFragment(
+    R.drawable.ic_heart,
+    R.string.frag_how_are_you_feeling_title,
+    R.string.frag_how_are_you_feeling_subtitle) {
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    val view = inflater.inflate(R.layout.frag_feeling, container, false)
-    setTitle(view, "\ue06f", R.string.frag_how_are_you_feeling_title, R.string.frag_how_are_you_feeling_subtitle)
-    view
+    getActivity.getLayoutInflater.inflate(R.layout.frag_journal_feeling, container, false)
   }
 
 }

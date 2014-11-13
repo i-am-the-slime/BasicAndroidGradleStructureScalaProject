@@ -3,17 +3,19 @@ package co.aryaapp.journal.audio
 import java.io.File
 import java.util.{TimerTask, Timer}
 
-import android.app.Activity
+import android.app.{AlertDialog, Activity}
+import android.content.DialogInterface
+import android.content.DialogInterface.OnClickListener
 import android.media.{MediaPlayer, MediaRecorder}
 import android.os.Environment
 import android.view.{View, ViewGroup}
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import co.aryaapp.{Animations, R, TR, TypedResource}
-import co.aryaapp.helpers.AndroidConversions
+import co.aryaapp.{R, TR, TypedResource}
+import co.aryaapp.helpers.{Animations, AndroidConversions}
 import AndroidConversions._
 import TypedResource._
-import org.scaloid.common.AlertDialogBuilder
+import me.drakeet.materialdialog.MaterialDialog
 
 import scala.util.Try
 
@@ -100,11 +102,11 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
 
   def record() = {
     startRecording()
-    def recordingCancelled() {
+    def recordingCancelled(view:View) {
       stopRecording()
       deleteRecording()
     }
-    def recordingAccepted() {
+    def recordingAccepted(v:View) {
       stopRecording()
       recordButton.setVisibility(View.GONE)
       playerContainer.setVisibility(View.VISIBLE)
@@ -113,7 +115,7 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
       updateViewFromPlayer(player)
     }
 
-    makeRecordingDialogue(recordingAccepted(), recordingCancelled())
+    makeRecordingDialogue(recordingAccepted, recordingCancelled)
   }
 
   def preparePlayer() = {
@@ -133,16 +135,18 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
     timeRemaining.setText("-"+millisToMMSS(player.getDuration))
   }
 
-  def makeRecordingDialogue(positive: => Unit, negative: => Unit) = {
-    val dialogue = new AlertDialogBuilder("Recording your voice...", null)
-    dialogue.positiveButton("Done", positive)
-    dialogue.negativeButton("Cancel", negative)
+  def makeRecordingDialogue(positive: (View) => Unit, negative: (View) => Unit) = {
     val inflater = ctx.getLayoutInflater
     val view = inflater.inflate(R.layout.dialogue_record, null)
     val recordingIndicator = view.findView(TR.recording_indicator)
-    val anim = Animations.spinHorizontally(1400).clbk(a => recordingIndicator.startAnimation(a))
+    val anim = Animations.spinHorizontally(1400).andThen(a => recordingIndicator.startAnimation(a))
     recordingIndicator.startAnimation(anim)
+
+    val dialogue = new MaterialDialog(ctx)
+    dialogue.setTitle("Recording your voice...")
     dialogue.setView(view)
+    dialogue.setPositiveButton("Done", (v:View) => { positive(v); dialogue.dismiss() })
+    dialogue.setNegativeButton("Cancel", (v:View) => { negative(v); dialogue.dismiss() })
     dialogue.show()
   }
 

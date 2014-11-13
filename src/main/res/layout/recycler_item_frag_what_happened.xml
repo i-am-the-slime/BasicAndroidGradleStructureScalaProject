@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+  <com.balysv.materialripple.MaterialRippleLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:arya="http://schemas.android.com/apk/res-auto"
+      android:id="@+id/what_happened_item_ripple"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:paddingLeft="16dip"
+      android:paddingRight="16dip"
+      android:paddingTop="4dip"
+      android:paddingBottom="4dip"
+      arya:rippleOverlay="false"
+      arya:rippleColor="@color/grey"
+      arya:rippleAlpha="1.0"
+      arya:rippleHover="true"
+      >
+  <CheckedTextView
+      android:id="@+id/what_happened_item_checkbox"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textSize="15sp"
+      android:textColor="@color/black"
+      android:checked="false"
+      android:checkable="true"
+      android:clickable="false"
+      android:checkMark="@drawable/abc_btn_check_material"
+      />
+    </com.balysv.materialripple.MaterialRippleLayout>
+</LinearLayout>

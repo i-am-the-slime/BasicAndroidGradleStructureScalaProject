@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:state_pressed="true">
+    <layer-list>
+      <item>
+        <bitmap android:src="@drawable/topshadow" />
+      </item>
+      <item android:top="9dp"
+        android:right="9dp"
+        android:bottom="9dp"
+        android:left="9dp"
+        android:drawable="@drawable/fab_circle"/>
+    </layer-list>
+  </item>
+  <item>
+    <layer-list>
+      <item android:drawable="@drawable/topshadow"/>
+      <item android:top="9dp"
+            android:right="9dp"
+            android:bottom="9dp"
+            android:left="9dp"
+            android:drawable="@drawable/fab_circle"/>
+      <item android:top="14dp"
+            android:right="14dp"
+            android:bottom="14dp"
+            android:left="14dp"
+            android:drawable="@drawable/ic_fab_arrow_right"/>
+    </layer-list>
+  </item>
+</selector>

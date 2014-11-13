@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">HorizontalBarChart</string>
+    <string name="app_name">Arya</string>
+    <string name="frag_how_are_you_feeling_title">How are you feeling?</string>
+    <string name="frag_how_are_you_feeling_subtitle">Move the slider to adjust your feeling</string>
+    <string name="frag_what_happened_title">What happened?</string>
+    <string name="frag_what_happened_subtitle">Choose one or more options</string>
+    <string name="frag_how_did_your_body_react_title">How did your body react?</string>
+    <string name="frag_how_did_your_body_react_subtitle">Touch the corresponding part</string>
+    <string name="frag_what_are_you_thinking_title">What are you thinking?</string>
+    <string name="frag_what_are_you_thinking_subtitle">Enter your thoughts in the text field</string>
+    <string name="frag_how_did_you_react_title">How did you react?</string>
+    <string name="frag_how_did_you_react_subtitle">Enter how you reacted to the situation at hand</string>
+    <string name="frag_done_title">You\'re done!</string>
+    <string name="frag_done_subtitle">Thank you, please confirm your entry.</string>
+    <string name="action_new_journal">Create a new journal entry.</string>
+    <string-array name="what_happened_defaults">
+        <item>Got teased</item>
+        <item>Good grade at school</item>
+        <item>Something else</item>
+    </string-array>
+    <string name="prefs_oauth_access_token">oauth_access_token</string>
+    <string name="login_forgot_label">Forgot? <a href="http://bier.de/">Reset my password</a></string>
+  <string name="agreeWithTerms">I agree with the <a href="http://sex.de/">ARYA terms</a></string>
+  <string-array name="main_tabs_titles">
+    <item>home</item>
+    <item>journal</item>
+  </string-array>
 </resources>

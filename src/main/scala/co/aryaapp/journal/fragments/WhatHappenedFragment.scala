@@ -1,29 +1,93 @@
 package co.aryaapp.journal.fragments
 
+import android.app.{AlertDialog, Dialog}
 import android.os.Bundle
+import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
+import android.support.v7.widget.RecyclerView.ViewHolder
 import android.util.Log
 import android.view.View.OnLongClickListener
 import co.aryaapp.database.AryaDB
 import android.view.{View, ViewGroup, LayoutInflater}
-import android.widget.BaseAdapter
+import android.widget.{EditText, CheckedTextView, BaseAdapter}
 import co.aryaapp.helpers.AndroidConversions
-import co.aryaapp.{TR, TypedResource, Animations, R}
+import co.aryaapp.{TR, TypedResource, R}
 import co.aryaapp.journal.JournalBaseFragment
 import AndroidConversions._
 import TypedResource._
-import org.scaloid.common._
+import me.drakeet.materialdialog.MaterialDialog
 
-class WhatHappenedFragment extends JournalBaseFragment{
+import scala.collection
+import scala.collection.parallel.mutable
 
-  lazy val listAdapter = new WhatHappenedListAdapter(getWhatHappenedItemsFromDB)
+class WhatHappenedViewHolder(itemView:View) extends ViewHolder(itemView) {
+  lazy val checkbox = itemView.findView(TR.what_happened_item_checkbox)
+  lazy val ripple = itemView.findView(TR.what_happened_item_ripple)
+}
+
+class WhatHappenedAdapter(items:collection.mutable.Stack[String]) extends RecyclerView.Adapter[WhatHappenedViewHolder] {
+
+  override def onCreateViewHolder(parent: ViewGroup, viewType: Int): WhatHappenedViewHolder = {
+    val view = LayoutInflater.from(parent.getContext).inflate(R.layout.recycler_item_frag_what_happened, parent, false)
+    new WhatHappenedViewHolder(view)
+  }
+
+  override def getItemCount: Int = items.length
+
+  override def onBindViewHolder(holder: WhatHappenedViewHolder, position: Int): Unit = {
+    val item = items(position)
+    val cb = holder.checkbox
+    cb.setText(item)
+    holder.ripple.setOnClickListener((v:View) => cb.toggle())
+  }
+}
+
+class WhatHappenedFragment extends
+      JournalBaseFragment(
+        R.drawable.ic_bubbles,
+        R.string.frag_what_happened_title,
+        R.string.frag_what_happened_subtitle) {
+
+  implicit val ctx = getActivity
   lazy val database = new AryaDB
+  def recyclerView = getActivity.findView(TR.what_happened_recycler_view)
+  lazy val plusButton = getActivity.findView(TR.plus_button)
+  val listItems = collection.mutable.Stack("Some", "Thing")
+  lazy val listItemAdapter = new WhatHappenedAdapter(listItems)
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    val view = inflater.inflate(R.layout.frag_what_happened, container, false)
-    setTitle(view, "\uE073", R.string.frag_what_happened_title, R.string.frag_what_happened_subtitle)
-    view.findView(TR.plus_button).onClick(initiateAddNewItem())
-    view.findView(TR.list_view).setAdapter(listAdapter)
+    val view = getActivity.getLayoutInflater.inflate(R.layout.frag_journal_what_happened, container, false)
+//    view.findView(TR.plus_button).onClick(initiateAddNewItem())
+//    view.findView(TR.list_view).setAdapter(listAdapter)
     view
+  }
+
+
+  override def onViewCreated(view: View, savedInstanceState: Bundle): Unit = {
+    super.onViewCreated(view, savedInstanceState)
+    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity))
+    recyclerView.setAdapter(listItemAdapter)
+    plusButton.setOnClickListener((v:View) => addNewListItem())
+  }
+
+  def addNewListItem() : Unit = {
+    val activity = getActivity
+    val input = new EditText(activity)
+    input.setTextColor(getActivity.getResources.getColor(R.color.black))
+    input.requestFocus()
+    val dialogue = new MaterialDialog(activity)
+    dialogue.setTitle("Type in what happened!")
+    dialogue.setView(input)
+    dialogue.setPositiveButton("OK", () => {
+        val text = input.getText.toString
+        if(text!="") {
+          listItems.push(text)
+          listItemAdapter.notifyItemInserted(0)
+        }
+      dialogue.dismiss()
+      }
+    )
+    dialogue.setNegativeButton("Cancel", () => dialogue.dismiss())
+    dialogue.show()
   }
 
   def getWhatHappenedItemsFromDB:List[String] = {
@@ -40,103 +104,4 @@ class WhatHappenedFragment extends JournalBaseFragment{
     database.writeWhatHappenedItems(items)
   }
 
-  def initiateAddNewItem() = {
-    val dialog = new AlertDialogBuilder("Add new option", "Write a short description of what happened"){
-      val result = new SEditText().singleLine(p = true).textColor(0xFF000000)
-
-      def addEditText():Unit = {
-        val item = result.getText.toString
-        addNewItem(item)
-      }
-      positiveButton("Add", addEditText())
-      negativeButton("Cancel")
-      setView(result)
-    }
-    dialog.show()
-  }
-
-  def addNewItem(item:String) = {
-    //Add it to the database
-    if (listAdapter.isNotYetInList(item)) {
-      listAdapter.add(item)
-      writeWhatHappenedItemsToDB(listAdapter.items)
-    }
-  }
-
-  class WhatHappenedListAdapter(var items:List[String]) extends BaseAdapter(){
-    val theId = 41
-    var checkedMap:Map[String, Boolean] = Map()
-
-    override def getView(position: Int, convertView: View, parent: ViewGroup): View = {
-      val text = items(position)
-
-      val trashCan = new STextView("\ue609")
-        .typeface(strokeTypeface)
-        .textSize(27 sp)
-        .textColor(R.color.black)
-        .visibility(View.INVISIBLE)
-        .onClick(remove(text))
-
-      val relLayout = new SRelativeLayout{
-        val checkbox = SCheckBox()
-          .<<
-          .alignParentLeft
-          .alignParentTop
-          .wrap
-          .>>
-
-        checkbox.onClick(flipChecked(text, checkbox))
-
-        setToCheckedIfWasChecked(text, checkbox)
-
-        val textView = STextView(text)
-          .typeface(latoTypeface)
-          .textSize(20 sp)
-          .textColor(R.color.black)
-          .<<.rightOf(checkbox).alignParentTop.>>
-
-        this += trashCan.<<.wrap.alignParentRight.>>
-
-      }
-      relLayout.padding(12 dip, 12 dip, 12 dip, 12 dip)
-      relLayout.id(theId)
-      relLayout.setOnLongClickListener(new OnLongClickListener {
-        override def onLongClick(v: View): Boolean = {
-          trashCan.visibility(View.VISIBLE)
-          trashCan.startAnimation(Animations.appearByRotation(200))
-          true
-        }
-      })
-      relLayout
-    }
-
-
-    def setToCheckedIfWasChecked(key:String, cb:SCheckBox) = {
-      checkedMap.get(key).fold()(cb.checked(_))
-    }
-
-    def flipChecked(key:String, cb:SCheckBox) = {
-      checkedMap += key -> cb.isChecked
-    }
-
-    override def getCount: Int = items.length
-
-    override def getItemId(position: Int): Long = theId
-
-    override def getItem(position: Int): String = items(position)
-
-    def isNotYetInList(string:String):Boolean = !items.contains(string)
-
-    def add(newItem:String) = {
-      items = newItem :: items
-      checkedMap += newItem -> true
-      notifyDataSetChanged()
-    }
-
-    def remove(item:String) = {
-      items = items.filter(i => i != item)
-      writeWhatHappenedItemsToDB(items)
-      notifyDataSetChanged()
-    }
-  }
 }

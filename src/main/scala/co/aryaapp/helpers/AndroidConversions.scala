@@ -6,18 +6,20 @@ import android.app._
 
 import android.content._
 import android.content.res.Configuration
+import android.hardware.input.InputManager
 import android.media.MediaPlayer.OnCompletionListener
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
+import android.os.{IBinder, Build, Handler, Looper}
 import android.view.View
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.view.View.{OnClickListener, OnFocusChangeListener}
 import android.widget._
 import android.view.LayoutInflater
 import android.text.{SpannableString, SpannableStringBuilder, Spanned}
 import android.text.style.{StyleSpan, ForegroundColorSpan}
 import android.graphics.Typeface
+import retrofit.{RetrofitError, Callback}
+import retrofit.client.Response
 import scala.annotation.tailrec
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
@@ -119,13 +121,32 @@ object AndroidConversions {
 
   /*Mark's stuff*/
 
+//  implicit def toShittyCallback[A](s:(A, Response) => Unit, f: RetrofitError => Unit) =
+//    new Callback[A] {
+//      override def success(p1: A, p2: Response): Unit = s
+//      override def failure(p1: RetrofitError): Unit = f
+//    }
+
+  def hideKeyboard(fromView:View)(implicit ctx:Context) =
+    ctx.getSystemService(Context.INPUT_METHOD_SERVICE)
+      .asInstanceOf[InputMethodManager]
+      .hideSoftInputFromWindow(fromView.getWindowToken, 0)
+
+  implicit def toFocusChangedListener(f:(View, Boolean) => Unit) = new OnFocusChangeListener {
+      override def onFocusChange(v: View, hasFocus: Boolean): Unit = f(v, hasFocus)
+  }
+
   implicit def toOnCompletionListener[A](f: (MediaPlayer) => A) =
     new OnCompletionListener { override def onCompletion(mp: MediaPlayer): Unit = f(mp) }
 
   implicit def toTimerTask[A](f: () => A) = new TimerTask() { override def run() = f() }
   /* End Mark's stuff */
 
-  implicit def toRunnable[A](f: () => A) = new Runnable() { override def run() = f() }
+  implicit def toRunnable[A](f: () => A): Runnable with Object {def run(): Unit} = new Runnable() { override def run() = f() }
+
+  implicit def toOnClickListener(f: View => Unit): OnClickListener with Object {def onClick(v: View): Unit} = new OnClickListener {
+    override def onClick(v: View): Unit = f(v)
+  }
 
   def async(r: Runnable) = _threadpool.execute(r)
 

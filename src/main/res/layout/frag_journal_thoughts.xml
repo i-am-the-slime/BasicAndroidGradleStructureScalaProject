@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <include android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             layout="@layout/partial_journal_title_bar"
+             android:layout_gravity="center_horizontal"
+            />
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:paddingBottom="80dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:lines="7"
+                android:ems="10"
+                android:hint="Here you can enter your thoughts..."
+                android:textColor="@android:color/black"
+                android:id="@+id/editText"
+                android:layout_gravity="center_horizontal"
+                />
+        <include android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 layout="@layout/partial_audio_recorder_and_player" android:layout_gravity="center_horizontal"/>
+
+    </LinearLayout>
+</LinearLayout>

@@ -36,8 +36,7 @@ object AryaDB {
 import AryaDB._
 
 class AryaDB(implicit val ctx:Context)
-  extends SQLiteOpenHelper(ctx, DB_NAME, null, DB_VERSION)
-  with org.scaloid.common.DatabaseImplicits {
+  extends SQLiteOpenHelper(ctx, DB_NAME, null, DB_VERSION) {
 
   override def onCreate(db: SQLiteDatabase): Unit = {
     db.execSQL(CREATE_TABLE_WHAT_HAPPENED_ITEMS)
@@ -48,9 +47,10 @@ class AryaDB(implicit val ctx:Context)
   }
 
   def readWhatHappenedItems:List[String] = {
-    val query = "SELECT " + COLUMN_ITEM + " FROM " + TABLE_WHAT_HAPPENED_ITEMS
-    val cursor = getReadableDatabase.rawQuery(query , null)
-    cursor.orm( c => c.getString(0))
+    //val query = "SELECT " + COLUMN_ITEM + " FROM " + TABLE_WHAT_HAPPENED_ITEMS
+    //val cursor = getReadableDatabase.rawQuery(query , null)
+    //TODO: Fix this
+    List("No", "No")
   }
 
   def writeWhatHappenedItems(items:List[String]) = {

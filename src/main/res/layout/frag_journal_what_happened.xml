@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <include android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             layout="@layout/partial_journal_title_bar"
+             android:layout_alignParentTop="true"
+             android:layout_centerHorizontal="true"
+             android:id="@+id/title_bar" />
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_below="@id/title_bar">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                fontPath="fonts/stroke.otf"
+                android:text=""
+                android:textSize="40sp"
+                android:textColor="@color/black"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="8dp"
+                android:id="@+id/plus_button"/>
+        <android.support.v7.widget.RecyclerView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="80dp"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@id/plus_button"
+                android:id="@+id/what_happened_recycler_view"/>
+    </RelativeLayout>
+</RelativeLayout>

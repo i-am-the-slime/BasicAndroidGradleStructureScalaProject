@@ -1,0 +1,30 @@
+<resources>
+  <color name="arya">#FF0066</color>
+  <color name="arya_dark">#DF0046</color>
+  <color name="arya_light">#ffff5694</color>
+  <color name="grey">#F5F6F7</color>
+  <color name="darker_grey">#E9E9E9</color>
+  <color name="hint_grey">#696969</color>
+  <color name="red">#ffff2638</color>
+  <color name="border_color">#dedede</color>
+  <color name="header_color">#ffefede2</color>
+  <color name="header_border_shadow">#ffffff</color>
+  <color name="section_color">#f0f0f0</color>
+  <color name="white">#ffefefef</color>
+  <color name="almostwhite">#aafdfdfd</color>
+  <color name="whitehalftransparent">#88fdfdfd</color>
+  <color name="whiteabittransparent">#bbfdfdfd</color>
+  <color name="whitetransparent">#44fdfdfd</color>
+  <color name="blue">#3334baff</color>
+  <color name="darkblue">#ff2873ff</color>
+  <color name="green">#3334f0ba</color>
+  <color name="greenfull">#ff6E8F8A</color>
+  <color name="bluefull">#ff94c1ba</color>
+  <color name="darkgreen">#ff20d043</color>
+  <color name="black">#dd222222</color>
+  <color name="pitchblack">#ff000000</color>
+  <color name="blackoverlay">#55000000</color>
+  <color name="blackeroverlay">#99000000</color>
+  <color name="greenoverlay">#99224433</color>
+  <color name="background_tab_pressed">#6633B5E5</color>
+</resources>

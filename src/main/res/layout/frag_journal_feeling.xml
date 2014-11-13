@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+        >
+    <include layout="@layout/partial_journal_title_bar"
+             android:id="@+id/title_bar"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_alignParentTop="true"
+            />
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_below="@id/title_bar"
+            >
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="80dp"
+                android:layout_marginTop="20dip"
+                >
+
+            <TextView style="@style/SeekBarCaption" android:text="Happiness"/>
+            <SeekBar style="@style/SeekBarStyle"
+                     android:id="@+id/happiness_sb"/>
+
+            <TextView style="@style/SeekBarCaption" android:text="Trust"/>
+            <SeekBar style="@style/SeekBarStyle" android:id="@+id/trust_sb"/>
+
+            <TextView style="@style/SeekBarCaption" android:text="Fear"/>
+            <SeekBar style="@style/SeekBarStyle" android:id="@+id/fear_sb"/>
+
+            <TextView style="@style/SeekBarCaption" android:text="Surprise"/>
+            <SeekBar style="@style/SeekBarStyle" android:id="@+id/surprise_sb"/>
+
+            <TextView style="@style/SeekBarCaption" android:text="Sadness"/>
+            <SeekBar style="@style/SeekBarStyle" android:id="@+id/sadness_sb"/>
+
+            <TextView style="@style/SeekBarCaption" android:text="Loneliness"/>
+            <SeekBar style="@style/SeekBarStyle" android:id="@+id/loneliness_sb"/>
+
+            <TextView style="@style/SeekBarCaption" android:text="Disgust"/>
+            <SeekBar style="@style/SeekBarStyle" android:id="@+id/disgust_sb"/>
+
+            <TextView style="@style/SeekBarCaption" android:text="Anger"/>
+            <SeekBar style="@style/SeekBarStyle" android:id="@+id/anger_sb"/>
+
+            <TextView style="@style/SeekBarCaption" android:text="Excitement"/>
+            <SeekBar style="@style/SeekBarStyle" android:id="@+id/excitement_sb"/>
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

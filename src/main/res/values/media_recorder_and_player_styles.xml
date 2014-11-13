@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="RecorderPlayerRoundButton">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">60dp</item>item>
+        <item name="android:textSize">30dp</item>
+        <item name="fontPath">fonts/stroke.otf</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/circle_button</item>
+        <item name="android:textColor">@color/arya</item>
+    </style>
+</resources>

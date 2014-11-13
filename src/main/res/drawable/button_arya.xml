@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:state_pressed="true">
+		<shape>
+			<solid
+					android:color="@color/arya"
+					/>
+			<corners
+					android:radius="3dip"
+					/>
+			<stroke
+					android:color="@color/arya_light"
+					android:width="3dp"
+					/>
+		</shape>
+	</item>
+	<item android:state_focused="true">
+		<shape>
+			<solid
+					android:color="@color/arya"
+					/>
+			<corners
+					android:radius="3dip"
+					/>
+			<stroke
+					android:color="@color/arya_dark"
+					android:width="3dp"
+					/>
+		</shape>
+	</item>
+	<item>
+		<shape>
+			<solid
+					android:color="@color/arya"
+					/>
+			<corners
+					android:radius="3dip"
+					/>
+            <stroke
+                    android:color="@color/arya"
+                    android:width="3dp"
+                    />
+		</shape>
+	</item>
+</selector>

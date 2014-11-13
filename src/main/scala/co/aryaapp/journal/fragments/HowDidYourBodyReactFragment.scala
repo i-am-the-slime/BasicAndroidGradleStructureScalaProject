@@ -4,6 +4,7 @@ import android.app.{Dialog, AlertDialog}
 import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutCompat
 import android.util.Log
 import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View, ViewGroup, LayoutInflater}
@@ -11,17 +12,20 @@ import android.widget.ImageView
 import co.aryaapp.{TR, TypedResource, R}
 import co.aryaapp.helpers.AndroidConversions
 import co.aryaapp.journal.JournalBaseFragment
-import org.scaloid.common._
 import AndroidConversions._
 import TypedResource._
 
 import scala.util.Try
 
-class HowDidYourBodyReactFragment extends JournalBaseFragment{
+class HowDidYourBodyReactFragment extends
+      JournalBaseFragment(
+        R.drawable.ic_body,
+        R.string.frag_how_did_your_body_react_title,
+        R.string.frag_how_did_your_body_react_subtitle
+      ){
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    val view = inflater.inflate(R.layout.frag_body, container, false)
-    setTitle(view, "\uE13e", R.string.frag_how_did_your_body_react_title, R.string.frag_how_did_your_body_react_subtitle)
+    val view = getActivity.getLayoutInflater.inflate(R.layout.frag_journal_body, container, false)
     //Set it up such that when clicking on body picture we check the
     val touchImage = view.findView(TR.touch_image)
     val referenceImage = view.findView(TR.colour_image)
@@ -80,24 +84,31 @@ class HowDidYourBodyReactFragment extends JournalBaseFragment{
       case _ => Array()
     }
 
+    //TODO: Bring back
     if(choices.length > 0) {
-      val dialogueBuilder = new AlertDialogBuilder("How does it feel?", null)
-      lazy val dialogue:Dialog = dialogueBuilder.show()
-      val view = new SVerticalLayout{
-        choices.foreach(
-          choice => SButton(choice)
-            .onClick(processChoice(choice, dialogue))
-            .textColor(0xFF000000)
-            .textSize(20 sp)
-            .typeface(latoTypeface)
-            .backgroundResource(R.drawable.button_dark)
-            .<<.margin(12 dip).>>
-        )
-      }
-      dialogueBuilder.setView(view)
-      dialogueBuilder.negativeButton("Cancel")
-      dialogue
+      val view = new LinearLayoutCompat(getActivity)
+//      new AlertDialog.Builder()
+//        .setTitle("How does it feel?")
+//        .set
     }
+//    if(choices.length > 0) {
+//      val dialogueBuilder = new AlertDialogBuilder("How does it feel?", null)
+//      lazy val dialogue:Dialog = dialogueBuilder.show()
+//      val view = new SVerticalLayout{
+//        choices.foreach(
+//          choice => SButton(choice)
+//            .onClick(processChoice(choice, dialogue))
+//            .textColor(0xFF000000)
+//            .textSize(20 sp)
+//            .typeface(latoTypeface)
+//            .backgroundResource(R.drawable.button_dark)
+//            .<<.margin(12 dip).>>
+//        )
+//      }
+//      dialogueBuilder.setView(view)
+//      dialogueBuilder.negativeButton("Cancel")
+//      dialogue
+//    }
   }
 
   def processChoice(choice:String, dialog:Dialog) = {

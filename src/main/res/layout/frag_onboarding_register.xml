@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/title"
+            android:weightSum="1"
+            android:paddingTop="20px"
+            android:background="@drawable/topshadow">
+        <EditText
+                android:id="@+id/registerEmail"
+                android:inputType="textEmailAddress"
+                android:hint="E-Mail Address"
+
+                style="@style/full_width_edit_text"
+                />
+        <View style="@style/grey_separator"/>
+        <EditText
+                android:id="@+id/registerPassword"
+                android:hint="Password"
+                android:inputType="textPassword"
+                style="@style/full_width_edit_text"
+                />
+        <View style="@style/grey_separator"/>
+        <EditText
+                android:id="@+id/repeatPassword"
+                android:hint="Repeat Password"
+                android:inputType="textPassword"
+                style="@style/full_width_edit_text"
+                />
+
+  <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:orientation="horizontal"
+      android:layout_marginTop="15dp"
+      android:layout_marginBottom="15dp"
+      android:layout_marginLeft="40dp"
+      android:layout_marginRight="40dp"
+  >
+    <CheckBox
+      android:id="@+id/termsCheckBox"
+      android:background="@drawable/abc_btn_check_material"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+    />
+    <TextView
+        android:id="@+id/termsCheckBoxLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:text="@string/agreeWithTerms"
+        />
+  </LinearLayout>
+  <TextView
+      android:id="@+id/registerError"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:visibility="gone"
+      android:layout_marginTop="20dp"
+      android:layout_marginLeft="40dp"
+      android:layout_marginRight="40dp"
+      android:text=""
+      android:textColor="@color/red"
+      android:textSize ="14sp"
+      />
+  <FrameLayout android:layout_width="match_parent"
+               android:layout_height="wrap_content">
+    <ProgressBar
+        android:id="@+id/registerProgress"
+        android:layout_width="wrap_content"
+        android:visibility="invisible"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/createAccountButton"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:text="Create New Account"
+        android:layout_marginLeft="10dip"
+        android:focusable="true"
+        android:layout_marginRight="10dip"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/button_arya"
+        android:layout_marginTop="15dip"/>
+  </FrameLayout>
+</LinearLayout>
