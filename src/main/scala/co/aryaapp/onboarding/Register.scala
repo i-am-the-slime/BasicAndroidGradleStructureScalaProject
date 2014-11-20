@@ -8,8 +8,7 @@ import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.{View, ViewGroup, LayoutInflater}
 import android.widget.{TextView, EditText}
-import co.aryaapp.communication.DataTypes.{User, PostUser}
-import co.aryaapp.communication.{AryaService, TokenGetter}
+import co.aryaapp.communication.{User, PostUser, AryaService, TokenGetter}
 import co.aryaapp.communication.TokenGetter.InvalidEmailOrPassword
 import co.aryaapp.helpers.AndroidConversions._
 import co.aryaapp._
@@ -30,7 +29,7 @@ class Register extends OnboardingFragment{
 
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    getActivity().getLayoutInflater().inflate(R.layout.frag_onboarding_register, container, false)
+    getActivity.getLayoutInflater.inflate(R.layout.frag_onboarding_register, container, false)
   }
 
   override def onViewCreated(view: View, savedInstanceState: Bundle): Unit = {

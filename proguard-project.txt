@@ -1,0 +1,36 @@
+-dontobfuscate
+-dontoptimize
+-dontwarn scala.collection.mutable.**
+-keep public class * extends junit.framework.TestCase
+-keepclassmembers class * extends junit.framework.TestCase { *; }
+-dontwarn org.scalatest.**
+-dontwarn org.scalactic.**
+-dontwarn org.scalamock.**
+  
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.squareup.okhttp.** { *; }
+-keep interface com.squareup.okhttp.** { *; }
+-dontwarn com.squareup.okhttp.**
+
+-dontwarn rx.**
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepclasseswithmembers class * {
+    @retrofit.http.* <methods>;
+}
+
+-keep class sun.misc.Unsafe { *; }
+#your package path where your gson models are stored
+-keep class com.example.models.** { *; }
+
+-dontwarn okio.**
+-dontwarn javax.naming.InitialContext
+-dontnote org.slf4j.**
+-keep class scala.collection.Seq.**
+-keep public class org.sqldroid.**
+-keep class scala.concurrent.Future$.**
+-keep class scala.slick.driver.JdbcProfile$Implicits
+-dontwarn org.joda.convert.**
+-dontwarn  scala.pickling.**
+-dontwarn com.fasterxml.**

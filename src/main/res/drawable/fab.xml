@@ -15,7 +15,7 @@
   </item>
   <item>
     <layer-list>
-      <item android:drawable="@drawable/topshadow"/>
+      <item android:drawable="@drawable/shadow"/>
       <item android:top="9dp"
             android:right="9dp"
             android:bottom="9dp"

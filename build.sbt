@@ -4,7 +4,6 @@ import android.Dependencies.aar
 
 android.Plugin.androidBuild
 
-
 name := "arya"
 
 platformTarget in Android := "android-21"
@@ -13,7 +12,11 @@ scalaVersion := "2.11.2"
 
 mergeManifests in Android := false
 
-proguardCache in Android += ProguardCache("slick") % "com.typesafe.slick"
+proguardCache in Android ++= Seq(
+    ProguardCache("argonaut") % "io.argonaut" %% "argonaut"
+  , ProguardCache("scalaz") % "scalaz" %% "scalaz"
+  , ProguardCache("slick") % "com.typesafe.slick"
+)
 
 resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
@@ -49,43 +52,7 @@ libraryDependencies ++= Seq(
   , "org.scalatest" %% "scalatest" % "2.2.0"
   , "org.scalamock" %% "scalamock-scalatest-support" % "3.1.2"
   , "org.scala-lang" %% "scala-pickling" % "0.9.0"
-)
-
-proguardOptions in Android ++= Seq(
-  "-dontobfuscate", "-dontoptimize", "-dontwarn scala.collection.mutable.**",
-  "-keep public class * extends junit.framework.TestCase",
-  "-keepclassmembers class * extends junit.framework.TestCase { *; }",
-  "-dontwarn org.scalatest.**",
-  "-dontwarn org.scalactic.**",
-  "-dontwarn org.scalamock.**",
-  """
-    |-keepattributes Signature
-    |-keepattributes *Annotation*
-    |-keep class com.squareup.okhttp.** { *; }
-    |-keep interface com.squareup.okhttp.** { *; }
-    |-dontwarn com.squareup.okhttp.**
-    |
-    |-dontwarn rx.**
-    |-dontwarn retrofit.**
-    |-keep class retrofit.** { *; }
-    |-keepclasseswithmembers class * {
-    |    @retrofit.http.* <methods>;
-    |}
-    |
-    |-keep class sun.misc.Unsafe { *; }
-    |#your package path where your gson models are stored
-    |-keep class com.example.models.** { *; }
-    |
-  """.stripMargin,
-  "-dontwarn okio.**",
-  "-dontwarn javax.naming.InitialContext", //Slick
-  "-dontnote org.slf4j.**",
-  "-keep class scala.collection.Seq.**",
-  "-keep public class org.sqldroid.**",
-  "-keep class scala.concurrent.Future$.**",
-  "-keep class scala.slick.driver.JdbcProfile$Implicits",
-  "-dontwarn org.joda.convert.**",
-  "-dontwarn  scala.pickling.**"
+  , "com.typesafe.play" %% "play-json" % "2.3.4"
 )
 
 scalacOptions in (Compile, compile) ++= Seq(
@@ -96,10 +63,12 @@ scalacOptions in (Compile, compile) ++= Seq(
 
 apkbuildExcludes in Android ++= Seq(
   "META-INF/LICENSE.txt",
-  "LICENSE.txt",
   "META-INF/NOTICE.txt",
+  "META-INF/LICENSE",
+  "META-INF/NOTICE",
+  "META-INF/license.txt",
   "META-INF/notice.txt",
-  "META-INF/license.txt"
+  "LICENSE.txt"
 )
 
 run <<= run in Android

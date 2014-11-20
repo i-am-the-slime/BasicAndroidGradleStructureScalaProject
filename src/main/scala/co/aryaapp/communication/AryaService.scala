@@ -3,8 +3,7 @@ package co.aryaapp.communication
 import java.lang.reflect.Type
 
 import android.os.AsyncTask
-import argonaut.Argonaut
-import co.aryaapp.communication.DataTypes._
+import co.aryaapp.persistence.AryaGson
 import com.google.gson.{FieldNamingPolicy, GsonBuilder}
 import com.squareup.okhttp._
 import retrofit.RequestInterceptor.RequestFacade
@@ -29,7 +28,6 @@ trait AryaPrivateService {
   def createJournal(@Body noteContainer: PostJournal):PostJournalResult
 }
 
-
 trait AryaPublicService {
   @GET("/themes")
   def themes(): ThemeContainer
@@ -49,17 +47,6 @@ class AryaPublicInterceptor extends RequestInterceptor{
       rf.addHeader("Authorization", "Client " + AryaService.CLIENT_ID)
 }
 
-class ArgonautConverter extends Converter {
-
-
-  override def fromBody(typedInput: TypedInput, `type`: Type): AnyRef = {
-    val string = scala.io.Source.fromInputStream(typedInput.in()).mkString
-
-  }
-
-
-  override def toBody(o: scala.Any): TypedOutput = ???
-}
 
 object AryaService {
   implicit val exec = ExecutionContext.fromExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
@@ -68,15 +55,13 @@ object AryaService {
   val SERVER_BASE = "http://aryaapp-staging.herokuapp.com"
   val JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8")
 
-  val gson = new GsonBuilder()
-                      .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                      .registerTypeAdapter(classOf[Answer], new AnswerDeSerialiser)
-                      .create()
+  val gson = AryaGson()
 
   def basicRestAdapter = new RestAdapter.Builder()
     .setEndpoint(SERVER_BASE)
     .setLogLevel(RestAdapter.LogLevel.FULL)
-    .setConverter(new GsonConverter(gson))
+//    .setConverter(new GsonConverter(gson))
+      .setConverter(new AryaConverter())
     .setClient(new OkClient(new OkHttpClient))
   
   private def privateRestAdapter(token:String) = basicRestAdapter

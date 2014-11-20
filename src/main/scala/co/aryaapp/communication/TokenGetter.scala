@@ -21,8 +21,8 @@ object TokenGetter {
 
   def getToken(email:String, password:String):Future[String] = Future {
     val client = new OkHttpClient()
-    val clientId = AryaService.CLIENT_ID
-    val clientSecret = AryaService.CLIENT_SECRET
+    val clientId = RestClient.ClientId
+    val clientSecret = RestClient.ClientSecret
     val requestString = s"""
           |{
           | "oauth": {
@@ -34,9 +34,9 @@ object TokenGetter {
           | }
           |}
         """.stripMargin
-    val body = RequestBody.create(AryaService.JSON_MEDIA_TYPE, requestString)
+    val body = RequestBody.create(RestClient.Json, requestString)
     val request = new Request.Builder()
-      .url(new URL(AryaService.SERVER_BASE + "/oauth/token"))
+      .url(new URL(RestClient.ServerBase + "/oauth/token"))
       .addHeader("Accept", "application/json")
       .post(body)
       .build()
@@ -48,14 +48,16 @@ object TokenGetter {
 
   def handleTokenRequestResultBody(responseCode:Int, responseBody:String):String = {
     val gson = new Gson()
+    val BadRequest = 400
+    val Ok = 200
     responseCode match {
-      case badRequest if badRequest == 400 =>
+      case BadRequest =>
         val container = gson.fromJson(responseBody, classOf[ServerErrorsContainer])
         container.errors.message match {
           case "Invalid email or password." =>
             throw new InvalidEmailOrPassword()
         }
-      case ok if ok == 200 =>
+      case Ok =>
         val container = gson.fromJson(responseBody, classOf[TokenContainer])
         container.token.access_token
     }
