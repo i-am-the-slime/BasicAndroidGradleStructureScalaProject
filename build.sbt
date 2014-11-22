@@ -39,10 +39,10 @@ libraryDependencies ++= Seq(
   , "com.squareup.picasso" % "picasso" % "2.3.4"
   , aar("com.google.android.gms" % "play-services" % "6.1.11")
   , "uk.co.chrisjenx" % "calligraphy" % "1.2.0"
-  , "com.squareup.retrofit" % "retrofit" % "1.6.1"
   , "com.squareup.okhttp" % "okhttp-urlconnection" % "2.0.0"
   , "com.squareup.okhttp" % "okhttp" % "2.0.0"
   , "io.argonaut" %% "argonaut" % "6.1-M4"
+  , "org.sqldroid" % "sqldroid" % "1.0.3"
   , "com.scalarx" %% "scalarx" % "0.2.6"
   , "org.slf4j" % "slf4j-nop" % "1.6.4"
   , "com.typesafe.slick" %% "slick" % "2.1.0"
@@ -72,6 +72,8 @@ apkbuildExcludes in Android ++= Seq(
 )
 
 run <<= run in Android
+
+test <<= test in Android
 
 install <<= install in Android
 

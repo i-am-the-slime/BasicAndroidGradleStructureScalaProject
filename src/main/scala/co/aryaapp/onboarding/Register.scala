@@ -8,7 +8,7 @@ import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.{View, ViewGroup, LayoutInflater}
 import android.widget.{TextView, EditText}
-import co.aryaapp.communication.{User, PostUser, AryaService, TokenGetter}
+import co.aryaapp.communication._
 import co.aryaapp.communication.TokenGetter.InvalidEmailOrPassword
 import co.aryaapp.helpers.AndroidConversions._
 import co.aryaapp._
@@ -66,7 +66,7 @@ class Register extends OnboardingFragment{
           createAccountButton.setVisibility(View.INVISIBLE)
           hideKeyboard(createAccountButton)
           val userToCreate = PostUser( User(email.getText.toString, hashPassword(password.getText.toString)) )
-          val createdUser = Try( AryaService.getPublicRestAdapter.createUser(userToCreate) )
+          val createdUser = Try( new RestClient(None).postToServer[PostUser, PostUserResult]("/users", userToCreate) )
           createdUser match {
             case Success(user) =>
               TokenGetter.getToken(email.getText.toString, password.getText.toString).onComplete{

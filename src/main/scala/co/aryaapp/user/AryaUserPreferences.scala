@@ -3,7 +3,6 @@ package co.aryaapp.user
 import android.content.Context
 import android.os.AsyncTask
 import android.preference.PreferenceManager
-import co.aryaapp.communication.AryaService
 
 import scala.concurrent.{ExecutionContext, Future}
 

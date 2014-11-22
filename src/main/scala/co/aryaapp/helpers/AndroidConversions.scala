@@ -18,8 +18,6 @@ import android.view.LayoutInflater
 import android.text.{SpannableString, SpannableStringBuilder, Spanned}
 import android.text.style.{StyleSpan, ForegroundColorSpan}
 import android.graphics.Typeface
-import retrofit.{RetrofitError, Callback}
-import retrofit.client.Response
 import scala.annotation.tailrec
 import android.util.Log
 import android.view.inputmethod.InputMethodManager

@@ -22,7 +22,7 @@ case class Unauthorized(msg:String) extends APIServerError(401, msg)
 case class BadRequest(msg:String) extends APIServerError(400, msg)
 case class UnknownError() extends APIServerError(-1, "Unknown error occurred")
 
-class RestClient(val accessToken:String) {
+class RestClient(val accessToken:Option[String]) {
   import RestClient._
 
   protected def getRequest(resource:String) = request(resource, None)
@@ -33,8 +33,8 @@ class RestClient(val accessToken:String) {
     val req = new Request.Builder()
       .url(ServerBase + resource)
       .header("Authorization", "Client " + ClientId)
-      .header("Authorization", "Bearer " + accessToken)
       .header("Content-Type", "application/json")
+    accessToken.foreach(t => req.header("Authorization", "Bearer " + t) )
     post.foreach(body => req.post(body))
     req.build()
   }

@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import argonaut._, Argonaut._
 import co.aryaapp.communication._
-import co.aryaapp.database.JournalIO
 import co.aryaapp.helpers.AryaBaseActivity
 import co.aryaapp.main.AryaMain
 import co.aryaapp.onboarding.{OnboardingActivity, TokenIntent}
 import co.aryaapp.user.AryaUserCredentials
-import retrofit.mime.{TypedString, TypedInput}
 import scala.collection.mutable.{Map => MMap}
 
 import scala.concurrent.Future
@@ -60,7 +58,7 @@ class AryaIntro extends AryaBaseActivity{
         ))
       )
 
-      val client = new RestClient(token)
+      val client = new RestClient(Some(token))
       val postResult = client.postToServer[Note, PostNoteResult]("/user/notes", Note("My best note, yeah?"))
       postResult.onComplete{
         case Success(s) =>

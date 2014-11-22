@@ -3,9 +3,6 @@ package co.aryaapp.user
 import android.content.{Context, SharedPreferences}
 import android.os.AsyncTask
 import android.preference.PreferenceManager
-import android.util.Log
-import co.aryaapp.TypedResource
-import co.aryaapp.communication.{TokenGetter, AryaService}
 import com.squareup.okhttp.{MediaType, RequestBody, Request, OkHttpClient}
 
 import scala.concurrent.{ExecutionContext, Future, Promise}

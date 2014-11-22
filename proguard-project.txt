@@ -32,5 +32,6 @@
 -keep class scala.concurrent.Future$.**
 -keep class scala.slick.driver.JdbcProfile$Implicits
 -dontwarn org.joda.convert.**
--dontwarn  scala.pickling.**
+-dontwarn scala.pickling.**
 -dontwarn com.fasterxml.**
+-dontwarn javax.naming.InitialContext

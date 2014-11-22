@@ -4,16 +4,22 @@ import java.net.URL
 
 import android.os.AsyncTask
 import android.util.Log
-import com.google.gson.Gson
 import com.squareup.okhttp.{Request, RequestBody, OkHttpClient}
+import argonaut._, Argonaut._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class TokenContainer(token:Token)
-case class Token(access_token:String, token_type:String)
+object TokenContainer {
+  implicit def TokenContainerCodecJson: CodecJson[TokenContainer] =
+    casecodec1(TokenContainer.apply, TokenContainer.unapply)("token")
+}
+case class Token(accessToken:String, tokenType:String)
+object Token {
+implicit def TokenCodecJson: CodecJson[Token] =
+casecodec2(Token.apply, Token.unapply)("access_token", "token_type")
+}
 
-case class ServerErrorsContainer(errors:ServerError)
-case class ServerError(code:Int, message:String)
 
 object TokenGetter {
   implicit val exec = ExecutionContext.fromExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
@@ -47,19 +53,18 @@ object TokenGetter {
   }
 
   def handleTokenRequestResultBody(responseCode:Int, responseBody:String):String = {
-    val gson = new Gson()
     val BadRequest = 400
     val Ok = 200
     responseCode match {
       case BadRequest =>
-        val container = gson.fromJson(responseBody, classOf[ServerErrorsContainer])
+        val container = responseBody.decodeOption[Resp].get
         container.errors.message match {
           case "Invalid email or password." =>
             throw new InvalidEmailOrPassword()
         }
       case Ok =>
-        val container = gson.fromJson(responseBody, classOf[TokenContainer])
-        container.token.access_token
+        val container = responseBody.decodeOption[TokenContainer].get
+        container.token.accessToken
     }
   }
 

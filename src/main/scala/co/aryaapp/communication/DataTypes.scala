@@ -5,8 +5,6 @@ import java.lang.reflect.Type
 import java.util.{List => JavaList}
 
 import argonaut.CodecJson
-import com.google.gson._
-import com.google.gson.{JsonObject => GsonObject}
 
 //def funky(name:String, args:String*) = {
 //val cc = "casecodec"+args.length
@@ -35,42 +33,81 @@ case class PostJournal(journal:Journal)
 case class PostJournalResult(journals:Journal)
 
 case class PostUser(user:User)
+object PostUser {
+  implicit def PostUserCodecJson: CodecJson[PostUser] =
+    casecodec1(PostUser.apply, PostUser.unapply)("user")
+}
 case class PostUserResult(users:User)
+object PostUserResult {
+  implicit def PostUserResultCodecJson: CodecJson[PostUserResult] =
+    casecodec1(PostUserResult.apply, PostUserResult.unapply)("users")
+}
+
 case class User(email:String, passwordHash:String)
-
-class RichJsonObject(implicit jsonObject:GsonObject) {
-  def getString(key:String) = jsonObject.get(key).getAsString
-  def getFloat(key:String) = jsonObject.get(key).getAsFloat
+object User {
+  implicit def UserCodecJson: CodecJson[User] =
+    casecodec2(User.apply, User.unapply)("email", "password_hash")
 }
 
+sealed trait Question {
+  def typ:String
+  def uuid:String
+}
+object Question{
+  implicit def QuestionCodecJson:CodecJson[Question] =
+    CodecJson({
+      case q: SliderQuestion => q.asJson
+      case q: CheckboxesQuestion => q.asJson
+      case q: BodyQuestion => q.asJson
+      case q: SoundQuestion => q.asJson
+      case q: TextQuestion => q.asJson
+    } ,
+      j => {
+        val typ = (j --\ "type").as[String].getOr("motherfucker_you_spell_wrong")
+        typ match {
+          case SliderQuestion.typ => SliderQuestion.SliderQuestionCodecJson(j).map[Question](identity)
+          case TextQuestion.typ => TextQuestion.TextQuestionCodecJson(j).map[Question](identity)
+          case CheckboxesQuestion.typ => CheckboxesQuestion.CheckboxesQuestionCodecJson(j).map[Question](identity)
+          case BodyQuestion.typ => BodyQuestion.BodyQuestionCodecJson(j).map[Question](identity)
+          case SoundQuestion.typ => SoundQuestion.SoundQuestionCodecJson(j).map[Question](identity)
+        }
+      }
+    )
+}
 
-abstract class Question(val question_type:String)
-case class SliderQuestion(uuid:String, name:String, min:Float, max:Float) extends Question("slider_question")
+case class SliderQuestion(uuid:String, name:String, min:Float, max:Float, typ:String=SliderQuestion.typ) extends Question
 object SliderQuestion{
+  val typ = "slider_question"
   implicit def SliderQuestionCodecJson: CodecJson[SliderQuestion] =
-    casecodec4(SliderQuestion.apply, SliderQuestion.unapply)("uuid", "name", "min", "max")
+    casecodec5(SliderQuestion.apply, SliderQuestion.unapply)("uuid", "name", "min", "max", "type")
 }
 
-case class TextQuestion(uuid:String, name:String) extends Question("text_question")
+case class TextQuestion(uuid:String, name:String, typ:String=TextQuestion.typ) extends Question
 object TextQuestion{
+  val typ = "text_question"
   implicit def TextQuestionCodecJson: CodecJson[TextQuestion] =
-    casecodec2(TextQuestion.apply, TextQuestion.unapply)("uuid", "name")
+    casecodec3(TextQuestion.apply, TextQuestion.unapply)("uuid", "name", "type")
 }
 
-case class CheckboxesQuestion(uuid:String, name:String) extends Question("checkboxes_question")
+case class CheckboxesQuestion(uuid:String, name:String, typ:String=CheckboxesQuestion.typ) extends Question
 object CheckboxesQuestion{
+  val typ = "checkboxes_question"
   implicit def CheckboxesQuestionCodecJson: CodecJson[CheckboxesQuestion] =
-    casecodec2(CheckboxesQuestion.apply, CheckboxesQuestion.unapply)("uuid", "name")
+    casecodec3(CheckboxesQuestion.apply, CheckboxesQuestion.unapply)("uuid", "name", "type")
 }
-case class BodyQuestion(uuid:String, name:String) extends Question("body_question")
+
+case class BodyQuestion(uuid:String, name:String, typ:String=BodyQuestion.typ) extends Question
 object BodyQuestion {
+  val typ = "body_question"
   implicit def BodyQuestionCodecJson: CodecJson[BodyQuestion] =
-    casecodec2(BodyQuestion.apply, BodyQuestion.unapply)("uuid", "name")
+    casecodec3(BodyQuestion.apply, BodyQuestion.unapply)("uuid", "name", "type")
 }
-case class SoundQuestion(uuid:String, name:String) extends Question("sound_question")
+
+case class SoundQuestion(uuid:String, name:String, typ:String=SoundQuestion.typ) extends Question
 object SoundQuestion {
+  val typ = "sound_question"
   implicit def SoundQuestionCodecJson: CodecJson[SoundQuestion] =
-    casecodec2(SoundQuestion.apply, SoundQuestion.unapply)("uuid", "name")
+    casecodec3(SoundQuestion.apply, SoundQuestion.unapply)("uuid", "name", "type")
 }
 
 case class JournalPage(uuid:String, title:String, subtitle:String, questions:List[Question])
@@ -85,36 +122,9 @@ object Journal {
     casecodec4(Journal.apply, Journal.unapply)("uuid", "created_at", "updated_at", "pages")
 }
 
-                                         // journalPageUuid to (questionUuid to Answer)
 case class JournalEntry(journalUuid:String, createdAt:String, updatedAt:String, answers:Map[String, Map[String, String]])
-
-
-trait AbstractSuperTypeDeSerialiser[A] extends JsonSerializer[A] with JsonDeserializer[A] {
-  val typeFieldName:String
-  val classOfMappings:Map[String, Type]
-  def typeFieldGetter:A => String
-
-  override def deserialize(jsonElement: JsonElement, `type`: Type, jsonDeserializationContext: JsonDeserializationContext): A = {
-    val json = jsonElement.getAsJsonObject
-    val key = json.get(typeFieldName).getAsString
-    val clazzOf = classOfMappings(key)
-    jsonDeserializationContext.deserialize(json, clazzOf)
-  }
-
-  override def serialize(t: A, `type`: Type, jsonSerializationContext: JsonSerializationContext): JsonElement = {
-    val clazzOf = classOfMappings(typeFieldGetter(t))
-    jsonSerializationContext.serialize(t, clazzOf)
-  }
+object JournalEntry {
+  implicit def JournalEntryCodecJson: CodecJson[JournalEntry] =
+    casecodec4(JournalEntry.apply, JournalEntry.unapply)("journal_uuid", "created_at", "updated_at", "answers")
 }
 
-class QuestionDeSerialiser extends AbstractSuperTypeDeSerialiser[Question] {
-  override val typeFieldName: String = "question_type"
-  override val classOfMappings: Map[String, Type] = Map(
-    "slider_question" -> classOf[SliderQuestion],
-    "text_question" -> classOf[TextQuestion],
-    "checkboxes_question" -> classOf[CheckboxesQuestion],
-    "body_question" -> classOf[CheckboxesQuestion],
-    "sound_question" -> classOf[SoundQuestion]
-  )
-  override def typeFieldGetter: (Question) => String = (a:Question) => a.question_type
-}

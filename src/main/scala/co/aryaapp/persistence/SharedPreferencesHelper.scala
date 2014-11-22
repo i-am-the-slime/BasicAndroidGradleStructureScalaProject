@@ -2,7 +2,6 @@ package co.aryaapp.persistence
 
 import android.content.Context
 import co.aryaapp.communication.Journal
-import com.google.gson.Gson
 
 object SharedPreferencesHelper {
   val Name = "co.aryaapp.arya"
