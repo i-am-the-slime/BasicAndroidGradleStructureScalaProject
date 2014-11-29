@@ -5,7 +5,7 @@ import co.aryaapp.journal.fragments._
 
 class JournalPagerAdapter(fm: FragmentManager) extends FragmentPagerAdapter(fm) {
 
-  val fragments = Seq(
+  val fragments:Seq[() => JournalBaseFragment] = Seq(
     () => new HowAreYouFeelingFragment
     ,() => new WhatHappenedFragment
     ,() => new HowDidYouReactFragment

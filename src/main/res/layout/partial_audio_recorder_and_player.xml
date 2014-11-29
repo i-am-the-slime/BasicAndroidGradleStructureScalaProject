@@ -10,6 +10,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/button_blue"
+                android:padding="8dp"
                 android:layout_margin="4dp"
                 android:text="Record your thoughts"
                 android:id="@+id/record_button"

@@ -14,6 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
+            android:layout_alignParentBottom="true"
             android:layout_below="@id/title_bar">
         <TextView
                 android:layout_width="wrap_content"
@@ -33,6 +34,10 @@
                 android:paddingBottom="80dp"
                 android:layout_alignParentBottom="true"
                 android:layout_below="@id/plus_button"
-                android:id="@+id/what_happened_recycler_view"/>
+                android:id="@+id/what_happened_recycler_view"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
     </RelativeLayout>
 </RelativeLayout>

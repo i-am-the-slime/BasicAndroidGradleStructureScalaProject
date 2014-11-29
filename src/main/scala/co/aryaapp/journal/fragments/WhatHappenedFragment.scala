@@ -1,6 +1,7 @@
 package co.aryaapp.journal.fragments
 
 import android.app.{AlertDialog, Dialog}
+import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import android.support.v7.widget.RecyclerView.ViewHolder
@@ -14,7 +15,6 @@ import co.aryaapp.{TR, TypedResource, R}
 import co.aryaapp.journal.JournalBaseFragment
 import AndroidConversions._
 import TypedResource._
-import me.drakeet.materialdialog.MaterialDialog
 
 import scala.collection
 import scala.collection.parallel.mutable
@@ -74,20 +74,19 @@ class WhatHappenedFragment extends
     val input = new EditText(activity)
     input.setTextColor(getActivity.getResources.getColor(R.color.black))
     input.requestFocus()
-    val dialogue = new MaterialDialog(activity)
-    dialogue.setTitle("Type in what happened!")
-    dialogue.setView(input)
-    dialogue.setPositiveButton("OK", () => {
+    new AlertDialog.Builder(activity)
+     .setTitle("Type in what happened!")
+     .setView(input)
+     .setPositiveButton("OK", (di:DialogInterface, _:Int) => {
         val text = input.getText.toString
         if(text!="") {
           listItems.push(text)
           listItemAdapter.notifyItemInserted(0)
         }
-      dialogue.dismiss()
-      }
-    )
-    dialogue.setNegativeButton("Cancel", () => dialogue.dismiss())
-    dialogue.show()
+      di.dismiss()
+      })
+     .setNegativeButton("Cancel", (di:DialogInterface, _:Int) => di.dismiss())
+     .show()
   }
 
   def getWhatHappenedItemsFromDB:List[String] = {

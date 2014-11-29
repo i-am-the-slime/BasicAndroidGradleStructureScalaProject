@@ -8,6 +8,7 @@ import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
 import android.media.{MediaPlayer, MediaRecorder}
 import android.os.Environment
+import android.util.Log
 import android.view.{View, ViewGroup}
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -15,7 +16,9 @@ import co.aryaapp.{R, TR, TypedResource}
 import co.aryaapp.helpers.{Animations, AndroidConversions}
 import AndroidConversions._
 import TypedResource._
-import me.drakeet.materialdialog.MaterialDialog
+import com.afollestad.materialdialogs.MaterialDialog.Callback
+import com.afollestad.materialdialogs.{Theme, MaterialDialogCompat, MaterialDialog}
+import com.google.android.gms.internal.di
 
 import scala.util.Try
 
@@ -102,11 +105,12 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
 
   def record() = {
     startRecording()
-    def recordingCancelled(view:View) {
+    def recordingCancelled() {
       stopRecording()
       deleteRecording()
     }
-    def recordingAccepted(v:View) {
+    def recordingAccepted() {
+      Log.e("MOTHER", "recording accepted")
       stopRecording()
       recordButton.setVisibility(View.GONE)
       playerContainer.setVisibility(View.VISIBLE)
@@ -135,19 +139,29 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
     timeRemaining.setText("-"+millisToMMSS(player.getDuration))
   }
 
-  def makeRecordingDialogue(positive: (View) => Unit, negative: (View) => Unit) = {
+  def makeRecordingDialogue(positive: () => Unit, negative: () => Unit) = {
     val inflater = ctx.getLayoutInflater
     val view = inflater.inflate(R.layout.dialogue_record, null)
     val recordingIndicator = view.findView(TR.recording_indicator)
     val anim = Animations.spinHorizontally(1400).andThen(a => recordingIndicator.startAnimation(a))
     recordingIndicator.startAnimation(anim)
 
-    val dialogue = new MaterialDialog(ctx)
-    dialogue.setTitle("Recording your voice...")
-    dialogue.setView(view)
-    dialogue.setPositiveButton("Done", (v:View) => { positive(v); dialogue.dismiss() })
-    dialogue.setNegativeButton("Cancel", (v:View) => { negative(v); dialogue.dismiss() })
-    dialogue.show()
+    new MaterialDialog.Builder(ctx)
+      .title("Recording your voice...")
+      .customView(view)
+      .positiveText("Done")
+      .negativeText("Cancel")
+      .negativeColor(ctx.getResources.getColor(R.color.black))
+      .theme(Theme.LIGHT)
+      .callback(new Callback {
+        override def onNegative(materialDialog: MaterialDialog): Unit = {
+          negative(); materialDialog.dismiss()
+        }
+        override def onPositive(materialDialog: MaterialDialog): Unit = {
+          positive(); materialDialog.dismiss()
+        }
+      })
+      .show()
   }
 
   def doesFileExist(path:String):Boolean = { new File(path).exists() }

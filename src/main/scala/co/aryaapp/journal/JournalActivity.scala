@@ -1,19 +1,10 @@
 package co.aryaapp.journal
 
-import android.app.Activity
-import android.content.Context
-import android.graphics.Typeface
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
 import android.support.v4.view.ViewPager
-import android.support.v7.app.ActionBarActivity
 import android.view.View
-import android.view.ViewGroup.LayoutParams
-import android.widget.TextView
 import co.aryaapp.helpers.{AryaBaseActivity, AndroidConversions}
-import co.aryaapp.journal.fragments.NonSwipingViewPager
 import co.aryaapp._
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 import language.postfixOps
 import TypedResource._
 import AndroidConversions._

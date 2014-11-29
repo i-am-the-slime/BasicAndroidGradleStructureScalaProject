@@ -23,15 +23,19 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:lines="7"
+                android:layout_margin="20dip"
                 android:ems="10"
                 android:hint="Here you can enter your thoughts..."
                 android:textColor="@android:color/black"
                 android:id="@+id/editText"
+                android:gravity="top"
                 android:layout_gravity="center_horizontal"
                 />
         <include android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 layout="@layout/partial_audio_recorder_and_player" android:layout_gravity="center_horizontal"/>
+                 layout="@layout/partial_audio_recorder_and_player"
+                 android:layout_gravity="center_horizontal"
+            />
 
     </LinearLayout>
 </LinearLayout>

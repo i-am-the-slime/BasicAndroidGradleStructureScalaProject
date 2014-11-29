@@ -62,10 +62,10 @@ class AryaIntro extends AryaBaseActivity{
       val postResult = client.postToServer[Note, PostNoteResult]("/user/notes", Note("My best note, yeah?"))
       postResult.onComplete{
         case Success(s) =>
-          Log.e("MOTHER", s"Result is $s")
+          Log.e("MOTHER", s"Post result is $s")
           val result= client.getFromServer[GetNotes]("/user/notes")
           result.onComplete{
-            case Success(s) => Log.e("MOTHER", s"Result is $s")
+            case Success(s) => Log.e("MOTHER", s"Get result is $s")
             case Failure(f) => Log.e("MOTHER", "Error is " + f.getMessage)
           }
         case Failure(f) => Log.e("MOTHER", "Error is " + f.getMessage)

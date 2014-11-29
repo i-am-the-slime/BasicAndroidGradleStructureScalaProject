@@ -10,7 +10,7 @@
   <color name="header_color">#ffefede2</color>
   <color name="header_border_shadow">#ffffff</color>
   <color name="section_color">#f0f0f0</color>
-  <color name="white">#ffefefef</color>
+  <color name="white">#ffffffff</color>
   <color name="almostwhite">#aafdfdfd</color>
   <color name="whitehalftransparent">#88fdfdfd</color>
   <color name="whiteabittransparent">#bbfdfdfd</color>

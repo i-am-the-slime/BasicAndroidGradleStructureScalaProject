@@ -16,6 +16,7 @@ proguardCache in Android ++= Seq(
     ProguardCache("argonaut") % "io.argonaut" %% "argonaut"
   , ProguardCache("scalaz") % "scalaz" %% "scalaz"
   , ProguardCache("slick") % "com.typesafe.slick"
+  , ProguardCache("material-dialogs") % "com.allofestad" % "material-design"
 )
 
 resolvers ++= Seq(
@@ -24,10 +25,12 @@ resolvers ++= Seq(
   "clinker" at "http://clinker.47deg.com/nexus/content/groups/public"
 )
 
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+
 libraryDependencies ++= Seq(
   "com.android.support" % "support-v4" % "21.0.0"
+  , aar("com.afollestad" % "material-dialogs" % "0.3.0")
   , aar("com.balysv" % "material-ripple" % "1.0.5-SNAPSHOT")
-  , aar("me.drakeet.materialdialog" % "library" % "1.0.7")
   , aar("com.balysv.materialmenu" % "material-menu-toolbar" % "1.4.0")
   , "com.nineoldandroids" % "library" % "2.4.0"
   , aar("com.android.support" % "appcompat-v7" % "21.0.0")
@@ -53,6 +56,7 @@ libraryDependencies ++= Seq(
   , "org.scalamock" %% "scalamock-scalatest-support" % "3.1.2"
   , "org.scala-lang" %% "scala-pickling" % "0.9.0"
   , "com.typesafe.play" %% "play-json" % "2.3.4"
+  , "co.aryaapp" %% "macros" % "1.0"
 )
 
 scalacOptions in (Compile, compile) ++= Seq(

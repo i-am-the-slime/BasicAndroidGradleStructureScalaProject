@@ -11,10 +11,35 @@ import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.time.Span._
 import argonaut._, Argonaut._
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
 
-class DatabaseTest extends AndroidTestCase with AssertionsForJUnit with Matchers with ScalaFutures  {
+class DatabaseTest extends AndroidTestCase with AssertionsForJUnit with Matchers with ScalaFutures {
+
+  def test_the_database_should_insert_journals() = {
+    implicit val ctx = getContext
+    val db = new SlickDatabase()
+    val journal = BasicJournals.createBasicJournal()
+    db.deleteJournal(journal)
+    db.addJournal(journal)
+    val savedJournal = db.getJournal(journal.uuid)
+    assert(journal == savedJournal.get)
+  }
+
+  def test_deleting_from_the_database_should_not_crash_if_the_journal_to_delete_cant_be_found() = {
+    implicit val ctx = getContext
+    val db = new SlickDatabase()
+    val journal = BasicJournals.createBasicJournal()
+    db.deleteJournal(journal)
+    db.deleteJournal(journal)
+  }
+
+  def test_the_database_should_survive_when_trying_to_insert_the_same_journal_twice() = {
+    implicit val ctx = getContext
+    val db = new SlickDatabase()
+    val journal = BasicJournals.createBasicJournal()
+    db.addJournal(journal)
+    db.addJournal(journal)
+  }
+
   def test_the_database_should_read_and_write_journal_entries() = {
     implicit val ctx = getContext
     val db = new SlickDatabase()

@@ -1,20 +1,21 @@
 package co.aryaapp.journal.fragments
 
-import android.app.{Dialog, AlertDialog}
-import android.graphics.Matrix
-import android.graphics.drawable.BitmapDrawable
+import android.graphics._
+import android.graphics.drawable.{TransitionDrawable, BitmapDrawable}
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutCompat
-import android.util.Log
 import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View, ViewGroup, LayoutInflater}
-import android.widget.ImageView
+import android.widget.{CheckBox, ImageView}
 import co.aryaapp.{TR, TypedResource, R}
 import co.aryaapp.helpers.AndroidConversions
 import co.aryaapp.journal.JournalBaseFragment
 import AndroidConversions._
 import TypedResource._
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.MaterialDialog.{SimpleCallback, Callback}
 
+import scala.collection.concurrent.TrieMap
 import scala.util.Try
 
 class HowDidYourBodyReactFragment extends
@@ -24,10 +25,12 @@ class HowDidYourBodyReactFragment extends
         R.string.frag_how_did_your_body_react_subtitle
       ){
 
+  def getTouchImage(v:View) = v.findView(TR.touch_image)
+
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
     val view = getActivity.getLayoutInflater.inflate(R.layout.frag_journal_body, container, false)
     //Set it up such that when clicking on body picture we check the
-    val touchImage = view.findView(TR.touch_image)
+    val touchImage = getTouchImage(view)
     val referenceImage = view.findView(TR.colour_image)
     val otl = getOnTouchListenerForImageView(touchImage, referenceImage)
     touchImage.setOnTouchListener(otl)
@@ -65,11 +68,13 @@ class HowDidYourBodyReactFragment extends
    val Crotch = -1245417
   }
 
+  val selectedBodyParts:TrieMap[Int, Seq[CharSequence]] = TrieMap()
+
   import BodyPartColours._
 
 
   def showDialogue(colour:Int) = {
-    val choices:Array[String] = colour match {
+    val choices: Array[String] = colour match {
       case Head => Array("My head hurts")
       case Neck => Array("My neck hurts")
       case Chest => Array("My chest hurts")
@@ -84,36 +89,87 @@ class HowDidYourBodyReactFragment extends
       case _ => Array()
     }
 
-    //TODO: Bring back
-    if(choices.length > 0) {
+    if (choices.length > 0) {
+      val checkboxes = for {
+        choice <- choices
+        cb = new CheckBox(getActivity)
+        _ = cb.setChecked(selectedBodyParts.getOrElse(colour, Nil).contains(choice))
+        _ = cb.setTextColor(getResources.getColor(R.color.black))
+        _ = cb.setText(choice)
+      } yield cb
+
       val view = new LinearLayoutCompat(getActivity)
-//      new AlertDialog.Builder()
-//        .setTitle("How does it feel?")
-//        .set
+      view.setOrientation(LinearLayoutCompat.VERTICAL)
+      for (cb <- checkboxes) view.addView(cb)
+
+      new MaterialDialog.Builder(getActivity)
+        .title("Select the correct things.")
+        .negativeColor(getResources.getColor(R.color.black))
+        .positiveText("OK")
+        .negativeText("Cancel")
+        .callback(new SimpleCallback {
+          override def onPositive(materialDialog: MaterialDialog): Unit = {
+            val texts = for {
+              cb <- checkboxes if cb.isChecked
+            } yield cb.getText
+            processChoice(colour, texts)
+          }
+        })
+        .customView(view)
+        .show()
     }
-//    if(choices.length > 0) {
-//      val dialogueBuilder = new AlertDialogBuilder("How does it feel?", null)
-//      lazy val dialogue:Dialog = dialogueBuilder.show()
-//      val view = new SVerticalLayout{
-//        choices.foreach(
-//          choice => SButton(choice)
-//            .onClick(processChoice(choice, dialogue))
-//            .textColor(0xFF000000)
-//            .textSize(20 sp)
-//            .typeface(latoTypeface)
-//            .backgroundResource(R.drawable.button_dark)
-//            .<<.margin(12 dip).>>
-//        )
-//      }
-//      dialogueBuilder.setView(view)
-//      dialogueBuilder.negativeButton("Cancel")
-//      dialogue
-//    }
+
+    def getCurrentImageBitmap:Bitmap = {
+      getTouchImage(getView).getDrawable.asInstanceOf[BitmapDrawable].getBitmap
+    }
+
+    def getImageFromBodyPart(colour:Int):Bitmap = {
+      val resource = colour match {
+        case Head => R.drawable.guy_head
+
+      }
+      val options = new BitmapFactory.Options()
+      options.inPreferredConfig = Bitmap.Config.ARGB_8888
+      BitmapFactory.decodeResource(getResources, resource, options)
+    }
+
+    def processChoice(colour: Int, texts: Seq[CharSequence]) = {
+      selectedBodyParts.get(colour) match {
+        case Some(issues) =>
+          selectedBodyParts.update(colour, texts)
+        case None =>
+          selectedBodyParts.put(colour, texts)
+      }
+      drawAllParts()
+    }
+
+    def drawAllParts() =  {
+      val touchImageView = getTouchImage(getView)
+      val options = new BitmapFactory.Options()
+      options.inPreferredConfig = Bitmap.Config.ARGB_8888
+      val base = BitmapFactory.decodeResource(getResources, R.drawable.guy, options)
+      touchImageView.setImageBitmap(base)
+      for {
+        (bodyPart, text) <- selectedBodyParts if text.nonEmpty
+      } replaceCurrentBitmap(bodyPart)
+      touchImageView.invalidate()
+    }
+
+
+    def replaceCurrentBitmap(colour:Int) = {
+      val touchImageView = getTouchImage(getView)
+      val bmp = drawOverBitmap(getCurrentImageBitmap, getImageFromBodyPart(colour))
+      touchImageView.setImageBitmap(bmp)
+    }
+
+    def drawOverBitmap(source:Bitmap, destination:Bitmap):Bitmap = {
+      val bmp = source.copy(Bitmap.Config.ARGB_8888, true)
+      source.recycle()
+      val canvas = new Canvas(bmp)
+      canvas.drawBitmap(destination, 0f, 0f, null)
+      destination.recycle()
+      bmp
+    }
   }
 
-  def processChoice(choice:String, dialog:Dialog) = {
-    //TODO:
-    dialog.cancel()
-    Log.e("MOTHER", choice)
-  }
 }

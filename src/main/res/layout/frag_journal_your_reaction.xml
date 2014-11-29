@@ -17,8 +17,11 @@
       android:background="@color/white">
   <EditText
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
+      android:layout_height="wrap_content"
       android:singleLine="false"
+      android:gravity="top"
+      android:lines="7"
+      android:layout_margin="20dip"
       android:hint="Write down your reaction here"
       />
   </FrameLayout>

@@ -4,7 +4,7 @@
   <item android:state_pressed="true">
     <layer-list>
       <item>
-        <bitmap android:src="@drawable/topshadow" />
+        <bitmap android:src="@drawable/shadow" />
       </item>
       <item android:top="9dp"
         android:right="9dp"

@@ -35,3 +35,4 @@
 -dontwarn scala.pickling.**
 -dontwarn com.fasterxml.**
 -dontwarn javax.naming.InitialContext
+-dontwarn scala.collection.**

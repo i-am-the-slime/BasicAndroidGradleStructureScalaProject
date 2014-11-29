@@ -5,7 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <include android:layout_width="wrap_content"
+    <include android:layout_width="match_parent"
              android:layout_height="wrap_content"
              layout="@layout/partial_journal_title_bar"
              android:id="@+id/title_bar"
@@ -17,11 +17,10 @@
                 android:layout_below="@id/title_bar"
                 android:layout_centerInParent="true"
                 android:layout_alignParentBottom="true"
-                android:paddingBottom="80dp"
                 android:background="@android:color/white"
                 android:id="@+id/scrollView">
             <RelativeLayout
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     >
                 <ImageView
@@ -32,7 +31,6 @@
                         android:layout_centerHorizontal="true"
                         android:src="@drawable/guy_coloured"
                         android:visibility="gone"
-                        android:layout_marginBottom="80dp"
                         />
                 <ImageView
                         android:layout_width="wrap_content"
@@ -41,7 +39,6 @@
                         android:layout_centerInParent="true"
                         android:layout_centerHorizontal="true"
                         android:src="@drawable/guy"
-                        android:layout_marginBottom="80dp"
                         />
             </RelativeLayout>
         </ScrollView>

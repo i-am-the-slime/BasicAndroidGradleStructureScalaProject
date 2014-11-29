@@ -1,32 +1,17 @@
 package co.aryaapp.communication
 import argonaut._, Argonaut._
+import co.aryaapp.macros.Macros._
 
-import java.lang.reflect.Type
 import java.util.{List => JavaList}
 
 import argonaut.CodecJson
 
-//def funky(name:String, args:String*) = {
-//val cc = "casecodec"+args.length
-//val nameJson = name+"CodecJson"
-//val argstring = args.mkString("\", \"")
-//s"""object $name {
-//  implicit def $nameJson: CodecJson[$name] =
-//    $cc($name.apply, $name.unapply)("$argstring")
-//}"""
-//}
-
 case class ThemeContainer(themes:JavaList[Theme])
 case class Theme(uuid:String, color:String, wallpaper:String, created_at:String, updated_at:String)
 
-case class GetNotes(notes:List[Note]) //Has an s and is a list
-object GetNotes { implicit def NotesCodecJson: CodecJson[GetNotes] = casecodec1(GetNotes.apply, GetNotes.unapply)("notes") }
-case class PostNote(note:Note) //Doesn't have a fucking s
-object PostNote { implicit def PostNoteCodecJson: CodecJson[PostNote] = casecodec1(PostNote.apply, PostNote.unapply)("note")}
-case class PostNoteResult(notes:Note) //Has a fucking s
-object PostNoteResult{ implicit def PostNoteResultCodecJson: CodecJson[PostNoteResult] = casecodec1(PostNoteResult.apply, PostNoteResult.unapply)("notes")}
-case class Note(content:String)
-object Note{ implicit def NoteCodecJson: CodecJson[Note] = casecodec1(Note.apply, Note.unapply)("content") }
+@argonaut case class GetNotes(notes:List[Note]) //Has an s and is a list
+@argonaut case class PostNoteResult(notes:Note) //Has a fucking s
+@argonaut case class Note(content:String)
 
 case class GetJournals(journals:List[Journal])
 case class PostJournal(journal:Journal)
@@ -53,6 +38,7 @@ sealed trait Question {
   def typ:String
   def uuid:String
 }
+
 object Question{
   implicit def QuestionCodecJson:CodecJson[Question] =
     CodecJson({
@@ -74,6 +60,8 @@ object Question{
       }
     )
 }
+
+
 
 case class SliderQuestion(uuid:String, name:String, min:Float, max:Float, typ:String=SliderQuestion.typ) extends Question
 object SliderQuestion{
@@ -102,7 +90,6 @@ object BodyQuestion {
   implicit def BodyQuestionCodecJson: CodecJson[BodyQuestion] =
     casecodec3(BodyQuestion.apply, BodyQuestion.unapply)("uuid", "name", "type")
 }
-
 case class SoundQuestion(uuid:String, name:String, typ:String=SoundQuestion.typ) extends Question
 object SoundQuestion {
   val typ = "sound_question"
@@ -116,7 +103,7 @@ object JournalPage {
     casecodec4(JournalPage.apply, JournalPage.unapply)("uuid", "title", "subtitle", "questions")
 }
 
-case class Journal(uuid:String, created_at:String, updated_at:String, pages:List[JournalPage])
+case class Journal(uuid:String, createdAt:String, updatedAt:String, pages:List[JournalPage])
 object Journal {
   implicit def JournalCodecJson: CodecJson[Journal] =
     casecodec4(Journal.apply, Journal.unapply)("uuid", "created_at", "updated_at", "pages")

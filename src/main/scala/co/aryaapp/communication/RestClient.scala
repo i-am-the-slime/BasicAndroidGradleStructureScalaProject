@@ -43,6 +43,7 @@ class RestClient(val accessToken:Option[String]) {
     val decodeResult = responseString.decode[Resp]
     val error = decodeResult.getOrElse(Resp(Errors(-1, "Unknown Error"))).errors
     error.code match {
+      case 400 => BadRequest(error.message)
       case 401 => Unauthorized(error.message)
       case _ => UnknownError()
     }
