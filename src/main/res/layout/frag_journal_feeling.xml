@@ -12,6 +12,7 @@
             />
 
     <ScrollView
+        android:padding="40dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
@@ -26,14 +27,14 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="80dp"
                 android:layout_marginTop="20dip"
+                android:id="@+id/slider_container"
                 >
 
             <TextView style="@style/SeekBarCaption" android:text="Happiness"/>
-            <SeekBar style="@style/SeekBarStyle"
-                     android:id="@+id/happiness_sb"/>
+            <SeekBar style="@style/SeekBarStyle"  android:id="@+id/happiness_sb"  />
 
             <TextView style="@style/SeekBarCaption" android:text="Trust"/>
-            <SeekBar style="@style/SeekBarStyle" android:id="@+id/trust_sb"/>
+            <SeekBar style="@style/SeekBarStyle"  android:id="@+id/trust_sb" />
 
             <TextView style="@style/SeekBarCaption" android:text="Fear"/>
             <SeekBar style="@style/SeekBarStyle" android:id="@+id/fear_sb"/>

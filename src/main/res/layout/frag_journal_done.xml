@@ -14,8 +14,10 @@
       android:layout_height="fill_parent"
       android:layout_below="@id/title_bar"
       android:background="@color/white">
+
   <Button android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:id="@+id/btn_confirm"
           android:layout_gravity="center_horizontal"
           android:layout_margin="20dip"
           android:background="@drawable/button_blue"

@@ -17,22 +17,58 @@ case class GetJournals(journals:List[Journal])
 case class PostJournal(journal:Journal)
 case class PostJournalResult(journals:Journal)
 
-case class PostUser(user:User)
-object PostUser {
-  implicit def PostUserCodecJson: CodecJson[PostUser] =
-    casecodec1(PostUser.apply, PostUser.unapply)("user")
+@argonaut case class TestJournal(answers:List[Answer])
+
+abstract class Answer { def typ:String }
+case class SliderAnswer(question:String, values:Map[String, Int], typ:String=SliderAnswer.typ) extends Answer
+object SliderAnswer{
+  val typ = "slider_answer"
+  implicit def codec: CodecJson[SliderAnswer] =
+    casecodec3(SliderAnswer.apply, SliderAnswer.unapply)("question", "values", "type")
 }
-case class PostUserResult(users:User)
-object PostUserResult {
-  implicit def PostUserResultCodecJson: CodecJson[PostUserResult] =
-    casecodec1(PostUserResult.apply, PostUserResult.unapply)("users")
+case class ListAnswer (question:String, values:List[String], typ:String=ListAnswer.typ) extends Answer
+object ListAnswer{
+  val typ = "list_answer"
+  implicit def codec: CodecJson[ListAnswer] =
+    casecodec3(ListAnswer.apply, ListAnswer.unapply)("question", "values", "type")
+}
+case class TextAnswer(question:String, values:String, typ:String=ListAnswer.typ) extends Answer
+object TextAnswer{
+  val typ = "text_answer"
+  implicit def codec: CodecJson[TextAnswer] =
+    casecodec3(TextAnswer.apply, TextAnswer.unapply)("question", "values", "type")
+}
+case class BodyAnswer(question:String, values:Map[String, List[String]], typ:String=BodyAnswer.typ) extends Answer
+object BodyAnswer{
+  val typ = "body_answer"
+  implicit def codec: CodecJson[BodyAnswer] =
+    casecodec3(BodyAnswer.apply, BodyAnswer.unapply)("question", "values", "type")
 }
 
-case class User(email:String, passwordHash:String)
-object User {
-  implicit def UserCodecJson: CodecJson[User] =
-    casecodec2(User.apply, User.unapply)("email", "password_hash")
+object Answer{
+  implicit def AnswerCodecJson:CodecJson[Answer] =
+  CodecJson({
+    case a:SliderAnswer => a.asJson
+    case a:ListAnswer  => a.asJson
+    case a:TextAnswer  => a.asJson
+    case a:BodyAnswer => a.asJson
+  },
+  j => {
+    val typ = (j --\ "type").as[String].getOr("motherfucker_you_spell_wrong")
+    typ match {
+      case SliderAnswer.typ => SliderAnswer.codec(j).map[Answer](identity)
+      case ListAnswer.typ => ListAnswer.codec(j).map[Answer](identity)
+      case TextAnswer.typ => TextAnswer.codec(j).map[Answer](identity)
+      case BodyAnswer.typ => BodyAnswer.codec(j).map[Answer](identity)
+    }
+  }
+  )
 }
+
+@argonaut case class PostUser(user:User)
+@argonaut case class PostUserResult(users:User)
+
+@argonaut case class User(email:String, passwordHash:String)
 
 sealed trait Question {
   def typ:String
@@ -60,8 +96,6 @@ object Question{
       }
     )
 }
-
-
 
 case class SliderQuestion(uuid:String, name:String, min:Float, max:Float, typ:String=SliderQuestion.typ) extends Question
 object SliderQuestion{
@@ -97,21 +131,9 @@ object SoundQuestion {
     casecodec3(SoundQuestion.apply, SoundQuestion.unapply)("uuid", "name", "type")
 }
 
-case class JournalPage(uuid:String, title:String, subtitle:String, questions:List[Question])
-object JournalPage {
-  implicit def JournalPageCodecJson: CodecJson[JournalPage] =
-    casecodec4(JournalPage.apply, JournalPage.unapply)("uuid", "title", "subtitle", "questions")
-}
+@argonaut case class JournalPage(uuid:String, title:String, subtitle:String, questions:List[Question])
 
-case class Journal(uuid:String, createdAt:String, updatedAt:String, pages:List[JournalPage])
-object Journal {
-  implicit def JournalCodecJson: CodecJson[Journal] =
-    casecodec4(Journal.apply, Journal.unapply)("uuid", "created_at", "updated_at", "pages")
-}
+@argonaut case class Journal(uuid:String, createdAt:String, updatedAt:String, pages:List[JournalPage])
 
-case class JournalEntry(journalUuid:String, createdAt:String, updatedAt:String, answers:Map[String, Map[String, String]])
-object JournalEntry {
-  implicit def JournalEntryCodecJson: CodecJson[JournalEntry] =
-    casecodec4(JournalEntry.apply, JournalEntry.unapply)("journal_uuid", "created_at", "updated_at", "answers")
-}
+@argonaut case class JournalEntry(journalUuid:String, createdAt:String, updatedAt:String, answers:Map[String, Map[String, String]])
 

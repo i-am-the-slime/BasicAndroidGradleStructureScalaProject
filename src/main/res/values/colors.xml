@@ -25,6 +25,7 @@
   <color name="pitchblack">#ff000000</color>
   <color name="blackoverlay">#55000000</color>
   <color name="blackeroverlay">#99000000</color>
+  <color name="blueoverlay">#9934baff</color>
   <color name="greenoverlay">#99224433</color>
   <color name="background_tab_pressed">#6633B5E5</color>
 </resources>

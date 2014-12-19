@@ -16,6 +16,7 @@
       android:layout_below="@id/title_bar"
       android:background="@color/white">
   <EditText
+      android:id="@+id/reaction"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:singleLine="false"

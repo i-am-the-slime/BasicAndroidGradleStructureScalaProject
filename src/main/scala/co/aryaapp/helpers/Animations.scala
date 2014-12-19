@@ -136,6 +136,11 @@ object Animations {
     applyBasicAttributes(a, duration, delay)
   }
 
+  def moveOutToRight(howfar:Float, duration:Int, delay:Int):MarkAnimation = {
+    val a = new TranslateAnimation(0.0f, howfar, 0.0f, 0.0f) with MarkAnimation
+    applyBasicAttributes(a, duration, delay)
+  }
+
   def moveDown(howfar:Float, duration:Int, delay:Int):MarkAnimation = {
     val a = new TranslateAnimation(0.0f, 0.0f, 0.0f, howfar) with MarkAnimation
     applyBasicAttributes(a, duration, delay)

@@ -1,4 +1,5 @@
 import android.Keys._
+import collection.JavaConversions._
 
 import android.Dependencies.aar
 
@@ -8,7 +9,7 @@ name := "arya"
 
 platformTarget in Android := "android-21"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.4"
 
 mergeManifests in Android := false
 
@@ -27,18 +28,25 @@ resolvers ++= Seq(
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
 
+unmanagedClasspath in Test ++= (builder in Android).value.getBootClasspath map
+  Attributed.blank
+
 libraryDependencies ++= Seq(
-  "com.android.support" % "support-v4" % "21.0.0"
+  "com.android.support" % "support-v4" % "21.0.3"
+  , "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % "test"
+  , "org.robolectric" % "robolectric" % "2.4" % "test->default"
+  , "junit" % "junit" % "4.11" % "test"
+  , "com.novocode" % "junit-interface" % "0.11" % "test"
   , aar("com.afollestad" % "material-dialogs" % "0.3.0")
   , aar("com.balysv" % "material-ripple" % "1.0.5-SNAPSHOT")
   , aar("com.balysv.materialmenu" % "material-menu-toolbar" % "1.4.0")
   , "com.nineoldandroids" % "library" % "2.4.0"
-  , aar("com.android.support" % "appcompat-v7" % "21.0.0")
-  , aar("com.android.support" % "gridlayout-v7" % "21.0.0")
+  , aar("com.android.support" % "appcompat-v7" % "21.0.3")
+  , aar("com.android.support" % "gridlayout-v7" % "21.0.3")
   , aar("com.github.dmytrodanylyk.circular-progress-button" % "library" % "1.1.3")
-  , aar("com.android.support" % "palette-v7" % "21.0.0")
-  , aar("com.android.support" % "cardview-v7" % "21.0.0")
-  , aar("com.android.support" % "recyclerview-v7" % "21.0.0")
+  , aar("com.android.support" % "palette-v7" % "21.0.3")
+  , aar("com.android.support" % "cardview-v7" % "21.0.3")
+  , aar("com.android.support" % "recyclerview-v7" % "21.0.3")
   , "com.squareup.picasso" % "picasso" % "2.3.4"
   , aar("com.google.android.gms" % "play-services" % "6.1.11")
   , "uk.co.chrisjenx" % "calligraphy" % "1.2.0"
@@ -56,7 +64,7 @@ libraryDependencies ++= Seq(
   , "org.scalamock" %% "scalamock-scalatest-support" % "3.1.2"
   , "org.scala-lang" %% "scala-pickling" % "0.9.0"
   , "com.typesafe.play" %% "play-json" % "2.3.4"
-  , "co.aryaapp" %% "macros" % "1.0"
+  , "co.aryaapp" %% "macros" % "1.2"
 )
 
 scalacOptions in (Compile, compile) ++= Seq(
@@ -77,11 +85,13 @@ apkbuildExcludes in Android ++= Seq(
 
 run <<= run in Android
 
-test <<= test in Android
-
 install <<= install in Android
 
-javaHome in (Compile, compile) := Some(file("/Library/Java/JavaVirtualMachines/jdk1.7.0_71.jdk/Contents/Home"))
+val java7Home = Some(file("/Library/Java/JavaVirtualMachines/jdk1.7.0_71.jdk/Contents/Home"))
+
+javaHome in (Compile, compile) := java7Home
+
+javaHome in (Compile, products) := java7Home
 
 val failedSound = Sounds.Basso
 

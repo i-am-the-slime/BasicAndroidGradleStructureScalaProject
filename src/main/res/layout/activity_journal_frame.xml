@@ -4,7 +4,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/default_background"
   >
 
   <co.aryaapp.journal.fragments.NonSwipingViewPager
@@ -23,6 +22,7 @@
     android:layout_marginTop="16dip"
     android:layout_marginLeft="16dip"
     android:background="@drawable/abc_ic_clear_mtrl_alpha"
+    android:visibility="invisible"
     android:contentDescription="exit"/>
 
   <Button

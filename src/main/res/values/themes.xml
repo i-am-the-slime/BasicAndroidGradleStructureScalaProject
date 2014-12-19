@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="Theme.Arya.NoActionBar" parent="@style/Theme.AppCompat">
+  <style name="Theme.Arya" parent="@style/Theme.AppCompat.NoActionBar">
     <item name="colorPrimary">@color/arya</item>
     <item name="colorPrimaryDark">@color/arya_dark</item>
     <item name="colorAccent">@color/arya_light</item>
-    <item name="windowActionBar">false</item>
-    <item name="windowActionBarOverlay">true</item>
-    <item name="android:windowActionBarOverlay">true</item>
+    <!--<item name="windowActionBar">false</item>-->
+    <!--<item name="windowActionBarOverlay">true</item>-->
+    <!--<item name="android:windowActionBarOverlay">true</item>-->
     <item name="android:textColorSecondary">@color/arya</item>
     <item name="android:editTextStyle">@style/AryaEditTextStyle</item>
     <item name="colorControlNormal">@color/arya</item>
     <item name="colorControlActivated">@color/arya</item>
     <item name="colorControlHighlight">@color/arya</item>
+  </style>
+
+  <style name="Theme.Arya.Journal" parent="@style/Theme.Arya">
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:windowIsFloating">false</item>
+    <item name="android:layout_margin">0dp</item>
+    <item name="android:backgroundDimEnabled">false</item>
   </style>
 
 

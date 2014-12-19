@@ -1,6 +1,5 @@
-package co.aryaapp
+package co.aryaapp.devicetest.helper
 
-import android.app.Instrumentation
 import android.test.InstrumentationTestCase
 import android.view.KeyEvent._
 

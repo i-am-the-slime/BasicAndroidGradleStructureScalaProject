@@ -7,6 +7,7 @@ import android.support.v7.widget.{LinearLayoutManager, RecyclerView}
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.util.Log
 import android.view.View.OnLongClickListener
+import co.aryaapp.communication.{ListAnswer, Answer}
 import co.aryaapp.database.AryaDB
 import android.view.{View, ViewGroup, LayoutInflater}
 import android.widget.{EditText, CheckedTextView, BaseAdapter}
@@ -61,6 +62,12 @@ class WhatHappenedFragment extends
     view
   }
 
+  def addListItem(item:String) = {
+    if(!listItems.contains(item)){
+      listItems.push(item)
+      listItemAdapter.notifyItemInserted(0)
+    }
+  }
 
   override def onViewCreated(view: View, savedInstanceState: Bundle): Unit = {
     super.onViewCreated(view, savedInstanceState)
@@ -80,8 +87,7 @@ class WhatHappenedFragment extends
      .setPositiveButton("OK", (di:DialogInterface, _:Int) => {
         val text = input.getText.toString
         if(text!="") {
-          listItems.push(text)
-          listItemAdapter.notifyItemInserted(0)
+          addListItem(text)
         }
       di.dismiss()
       })
@@ -103,4 +109,16 @@ class WhatHappenedFragment extends
     database.writeWhatHappenedItems(items)
   }
 
+  override def populateViewFromAnswer(answer: Answer): Unit = answer match {
+    case ListAnswer(_, list, _) => for (item <- list) addListItem(item)
+  }
+
+  override def getAnswerFromView: Option[Answer] = {
+    val values = for{
+      index <- 0 until recyclerView.getChildCount
+      child = recyclerView.getChildAt(index) if child.getId == R.id.what_happened_item_checkbox
+      checkedTV:CheckedTextView = child.asInstanceOf[CheckedTextView] if child.isActivated
+    } yield checkedTV.getText.toString
+    Some(ListAnswer("dont know the uuid", values.toList))
+  }
 }

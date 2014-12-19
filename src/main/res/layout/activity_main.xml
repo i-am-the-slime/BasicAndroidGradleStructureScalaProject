@@ -5,38 +5,61 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 >
+  <co.aryaapp.journal.fragments.NonSwipingViewPager
+    android:id="@+id/mainPager"
+    android:layout_alignParentTop="true"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:background="@drawable/default_background"
+  />
 
-  <android.support.v4.widget.DrawerLayout
-      android:id="@+id/drawerLayout"
-      android:layout_alignParentTop="true"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
-      <!-- Content -->
-      <co.aryaapp.journal.fragments.NonSwipingViewPager
-          android:id="@+id/mainPager"
-          android:layout_alignParentBottom="true"
-          android:layout_width="match_parent"
-          android:background="@color/white"
-          android:layout_height="wrap_content">
-      </co.aryaapp.journal.fragments.NonSwipingViewPager>
-      <!-- The navigation drawer -->
-      <android.support.v7.widget.RecyclerView
-          android:id="@+id/mainMenuRecyclerView"
-          android:layout_marginTop="?attr/actionBarSize"
-          android:background="@color/white"
-          android:scrollbars="vertical"
-          android:layout_gravity="start"
-          android:layout_width="match_parent"
-          android:layout_height="fill_parent"
-          />
-
-  </android.support.v4.widget.DrawerLayout>
-
-  <android.support.v7.widget.Toolbar
-      android:id="@+id/mainToolbar"
-      android:layout_height="?attr/actionBarSize"
-      android:layout_width="match_parent"
-      android:layout_alignParentTop="true"
-      style="@style/AryaActionBarStyle"
-        />
+  <co.aryaapp.view.ImageSlidingTabLayout
+    android:id="@+id/slidingTabs"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+  />
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:layout_below="@id/slidingTabs"-->
+        <!--android:orientation="horizontal">-->
+      <!--<TextView-->
+          <!--android:layout_width="0dp"-->
+          <!--android:padding="0dp"-->
+          <!--android:layout_height="match_parent"-->
+          <!--fontPath="fonts/stroke.otf"-->
+          <!--android:text=""-->
+          <!--android:layout_weight="1"-->
+          <!--android:gravity="center"-->
+          <!--android:textColor="@color/white"-->
+          <!--android:textSize="40sp"-->
+          <!--android:background="@color/blackoverlay"-->
+          <!--android:id="@+id/home_tab"-->
+      <!--/>-->
+      <!--<TextView-->
+          <!--android:layout_width="0dp"-->
+          <!--android:layout_height="match_parent"-->
+          <!--fontPath="fonts/stroke.otf"-->
+          <!--android:text=""-->
+          <!--android:textSize="40sp"-->
+          <!--android:textColor="@color/whitetransparent"-->
+          <!--android:gravity="center"-->
+          <!--android:layout_weight="1"-->
+          <!--android:background="@color/blue"-->
+          <!--android:id="@+id/new_journal_tab"-->
+      <!--/>-->
+      <!--<TextView-->
+          <!--android:layout_width="0dp"-->
+          <!--android:layout_height="match_parent"-->
+          <!--android:textColor="@color/whitetransparent"-->
+          <!--fontPath="fonts/stroke.otf"-->
+          <!--android:text=""-->
+          <!--android:layout_weight="1"-->
+          <!--android:gravity="center"-->
+          <!--android:background="@color/blackoverlay"-->
+          <!--android:textSize="40sp"-->
+          <!--android:id="@+id/old_journals_tab"-->
+      <!--/>-->
+    <!--</LinearLayout>-->
 </RelativeLayout>

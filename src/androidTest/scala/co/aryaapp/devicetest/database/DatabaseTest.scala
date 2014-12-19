@@ -1,18 +1,11 @@
-package co.aryaapp
+package co.aryaapp.devicetest.database
 
-
-import android.test.AndroidTestCase
-import android.util.Log
 import co.aryaapp.communication._
-import co.aryaapp.database.{SlickDatabase, BasicJournals}
-import org.scalatest.Matchers
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.junit.AssertionsForJUnit
-import org.scalatest.time.Span._
-import argonaut._, Argonaut._
+import co.aryaapp.database.{BasicJournals, SlickDatabase}
+import co.aryaapp.devicetest.helper.BaseAryaActivityTest
 
 
-class DatabaseTest extends AndroidTestCase with AssertionsForJUnit with Matchers with ScalaFutures {
+class DatabaseTest extends BaseAryaActivityTest {
 
   def test_the_database_should_insert_journals() = {
     implicit val ctx = getContext
@@ -21,7 +14,7 @@ class DatabaseTest extends AndroidTestCase with AssertionsForJUnit with Matchers
     db.deleteJournal(journal)
     db.addJournal(journal)
     val savedJournal = db.getJournal(journal.uuid)
-    assert(journal == savedJournal.get)
+    journal should be (savedJournal.get)
   }
 
   def test_deleting_from_the_database_should_not_crash_if_the_journal_to_delete_cant_be_found() = {

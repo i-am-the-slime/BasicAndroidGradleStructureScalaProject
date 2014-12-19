@@ -8,6 +8,7 @@
 
     <ImageView
         android:id="@+id/titlebar_icon"
+        android:visibility="invisible"
         android:layout_width="24dip"
         android:layout_height="24dip"
         android:layout_gravity="center_horizontal"

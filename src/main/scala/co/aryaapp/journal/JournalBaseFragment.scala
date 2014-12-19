@@ -4,7 +4,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.{View, Gravity}
-import co.aryaapp.communication.Question
+import co.aryaapp.communication.{Answer, Question}
 import co.aryaapp.{TR, TypedResource}
 import co.aryaapp.helpers.AndroidConversions
 import language.postfixOps
@@ -20,6 +20,6 @@ abstract case class JournalBaseFragment(icon:Int, title:Int, subtitle:Int) exten
     view.findView(TR.titlebar_subtitle).setText(subtitle)
   }
 
-//  def populateViewFromAnswers(answers:List[Answer])
-//  def getAnswersFromView():List[Answer]
+  def populateViewFromAnswer(answer:Answer)
+  def getAnswerFromView:Option[Answer]
 }

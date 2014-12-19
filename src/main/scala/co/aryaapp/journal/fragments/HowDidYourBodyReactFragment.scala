@@ -4,9 +4,11 @@ import android.graphics._
 import android.graphics.drawable.{TransitionDrawable, BitmapDrawable}
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutCompat
+import android.util.Log
 import android.view.View.OnTouchListener
 import android.view.{MotionEvent, View, ViewGroup, LayoutInflater}
 import android.widget.{CheckBox, ImageView}
+import co.aryaapp.communication.{BodyAnswer, Answer}
 import co.aryaapp.{TR, TypedResource, R}
 import co.aryaapp.helpers.AndroidConversions
 import co.aryaapp.journal.JournalBaseFragment
@@ -17,6 +19,8 @@ import com.afollestad.materialdialogs.MaterialDialog.{SimpleCallback, Callback}
 
 import scala.collection.concurrent.TrieMap
 import scala.util.Try
+import scalaz.{Isomorphism, IsomorphismsLow0}
+import BodyModel._
 
 class HowDidYourBodyReactFragment extends
       JournalBaseFragment(
@@ -46,46 +50,37 @@ class HowDidYourBodyReactFragment extends
         reference.getImageMatrix.invert(matrix)
         matrix.mapPoints(matrixed)
         val pixel = Try(reference.getDrawable.asInstanceOf[BitmapDrawable].getBitmap.getPixel(matrixed(0).toInt, matrixed(1).toInt)).getOrElse(0xFFFFFFFF)
-        if (pixel != 0xFFFFFFFF) {
-          showDialogue(pixel)
+        Log.e("MOTHER", pixel.toString)
+        val bodyPart = colourToBodyPart.get(pixel)
+        if (bodyPart.isDefined) {
+          showDialogue(bodyPart.get)
           true
         } else false
       }
     }
   }
 
-  object BodyPartColours {
-   val Head = -7367566
-   val Neck = -417537
-   val Chest = -59576
-   val Belly = -14542849
-   val LeftArm = -16580695
-   val RightArm = -35584
-   val LeftLeg = -13540045
-   val RightLeg = -15209217
-   val LeftFoot = -3457664
-   val RightFoot = -7184064
-   val Crotch = -1245417
-  }
+  val selectedBodyParts:TrieMap[BodyPart, Seq[CharSequence]] = TrieMap()
 
-  val selectedBodyParts:TrieMap[Int, Seq[CharSequence]] = TrieMap()
-
-  import BodyPartColours._
-
-
-  def showDialogue(colour:Int) = {
-    val choices: Array[String] = colour match {
-      case Head => Array("My head hurts")
-      case Neck => Array("My neck hurts")
-      case Chest => Array("My chest hurts")
+  def showDialogue(bodyPart:BodyPart) = {
+    val choices: Array[String] = bodyPart match {
       case Belly => Array("Butterflies in my stomach", "My stomach hurts")
-      case LeftArm => Array("My left arm hurts")
-      case RightArm => Array("My right arm hurts")
-      case LeftLeg => Array("My left leg hurts")
-      case RightLeg => Array("My right leg hurts")
+      case Chest => Array("My chest hurts")
       case LeftFoot => Array("My left foot hurts")
       case RightFoot => Array("My right foot hurts")
-      case Crotch => Array("AAAAAARGH!")
+      case LeftForearm => Array("My left forearm hurts")
+      case RightForearm => Array("My right forearm hurts")
+      case Groin => Array("My balls hurt")
+      case LeftHand => Array("My left hand hurts")
+      case RightHand => Array("My right hand hurts")
+      case Head => Array("My head hurts")
+      case Neck => Array("My neck hurts")
+      case LeftShin => Array("My left shin hurts")
+      case RightShin => Array("My right shin hurts")
+      case LeftThigh => Array("My left thigh hurts")
+      case RightThigh => Array("My right thigh hurts")
+      case LeftUpperArm => Array("My left upper arm hurts")
+      case RightUpperArm =>  Array("My right upper arm hurts")
       case _ => Array()
     }
 
@@ -93,7 +88,7 @@ class HowDidYourBodyReactFragment extends
       val checkboxes = for {
         choice <- choices
         cb = new CheckBox(getActivity)
-        _ = cb.setChecked(selectedBodyParts.getOrElse(colour, Nil).contains(choice))
+        _ = cb.setChecked(selectedBodyParts.getOrElse(bodyPart, Nil).contains(choice))
         _ = cb.setTextColor(getResources.getColor(R.color.black))
         _ = cb.setText(choice)
       } yield cb
@@ -112,64 +107,97 @@ class HowDidYourBodyReactFragment extends
             val texts = for {
               cb <- checkboxes if cb.isChecked
             } yield cb.getText
-            processChoice(colour, texts)
+            processChoice(bodyPart, texts)
           }
         })
         .customView(view)
         .show()
     }
 
-    def getCurrentImageBitmap:Bitmap = {
-      getTouchImage(getView).getDrawable.asInstanceOf[BitmapDrawable].getBitmap
-    }
-
-    def getImageFromBodyPart(colour:Int):Bitmap = {
-      val resource = colour match {
-        case Head => R.drawable.guy_head
-
-      }
-      val options = new BitmapFactory.Options()
-      options.inPreferredConfig = Bitmap.Config.ARGB_8888
-      BitmapFactory.decodeResource(getResources, resource, options)
-    }
-
-    def processChoice(colour: Int, texts: Seq[CharSequence]) = {
-      selectedBodyParts.get(colour) match {
+    def processChoice(bodyPart: BodyPart, texts: Seq[CharSequence]) = {
+      selectedBodyParts.get(bodyPart) match {
         case Some(issues) =>
-          selectedBodyParts.update(colour, texts)
+          selectedBodyParts.update(bodyPart, texts)
         case None =>
-          selectedBodyParts.put(colour, texts)
+          selectedBodyParts.put(bodyPart, texts)
       }
       drawAllParts()
     }
-
-    def drawAllParts() =  {
-      val touchImageView = getTouchImage(getView)
-      val options = new BitmapFactory.Options()
-      options.inPreferredConfig = Bitmap.Config.ARGB_8888
-      val base = BitmapFactory.decodeResource(getResources, R.drawable.guy, options)
-      touchImageView.setImageBitmap(base)
-      for {
-        (bodyPart, text) <- selectedBodyParts if text.nonEmpty
-      } replaceCurrentBitmap(bodyPart)
-      touchImageView.invalidate()
-    }
-
-
-    def replaceCurrentBitmap(colour:Int) = {
-      val touchImageView = getTouchImage(getView)
-      val bmp = drawOverBitmap(getCurrentImageBitmap, getImageFromBodyPart(colour))
-      touchImageView.setImageBitmap(bmp)
-    }
-
-    def drawOverBitmap(source:Bitmap, destination:Bitmap):Bitmap = {
-      val bmp = source.copy(Bitmap.Config.ARGB_8888, true)
-      source.recycle()
-      val canvas = new Canvas(bmp)
-      canvas.drawBitmap(destination, 0f, 0f, null)
-      destination.recycle()
-      bmp
-    }
   }
 
+  def getCurrentImageBitmap:Bitmap = {
+    getTouchImage(getView).getDrawable.asInstanceOf[BitmapDrawable].getBitmap
+  }
+
+  def getImageFromBodyPart(bodyPart:BodyPart):Bitmap = {
+    val resource = bodyPart match {
+      case Belly => R.drawable.body_belly
+      case Chest => R.drawable.body_chest
+      case LeftFoot => R.drawable.body_foot_left
+      case RightFoot => R.drawable.body_foot_right
+      case LeftForearm => R.drawable.body_forearm_left
+      case RightForearm => R.drawable.body_forearm_right
+      case Groin => R.drawable.body_groin
+      case LeftHand => R.drawable.body_hand_left
+      case RightHand => R.drawable.body_hand_right
+      case Head => R.drawable.body_head
+      case Neck => R.drawable.body_neck
+      case LeftShin => R.drawable.body_shin_left
+      case RightShin => R.drawable.body_shin_right
+      case LeftThigh => R.drawable.body_thigh_left
+      case RightThigh => R.drawable.body_thigh_right
+      case LeftUpperArm => R.drawable.body_upper_arm_left
+      case RightUpperArm => R.drawable.body_upper_arm_right
+    }
+    val options = new BitmapFactory.Options()
+    options.inPreferredConfig = Bitmap.Config.ARGB_8888
+    BitmapFactory.decodeResource(getResources, resource, options)
+  }
+
+  def drawAllParts() =  {
+    val touchImageView = getTouchImage(getView)
+    val options = new BitmapFactory.Options()
+    options.inPreferredConfig = Bitmap.Config.ARGB_8888
+    val base = BitmapFactory.decodeResource(getResources, R.drawable.body, options)
+    touchImageView.setImageBitmap(base)
+    for {
+      (bodyPart, text) <- selectedBodyParts if text.nonEmpty
+    } replaceCurrentBitmap(bodyPart)
+    touchImageView.invalidate()
+  }
+
+  def replaceCurrentBitmap(bodyPart:BodyPart) = {
+    val touchImageView = getTouchImage(getView)
+    val bmp = drawOverBitmap(getCurrentImageBitmap, getImageFromBodyPart(bodyPart))
+    touchImageView.setImageBitmap(bmp)
+  }
+
+  def drawOverBitmap(source:Bitmap, destination:Bitmap):Bitmap = {
+    val bmp = source.copy(Bitmap.Config.ARGB_8888, true)
+    source.recycle()
+    val canvas = new Canvas(bmp)
+    canvas.drawBitmap(destination, 0f, 0f, null)
+    destination.recycle()
+    bmp
+  }
+
+  override def populateViewFromAnswer(answer: Answer): Unit = answer match {
+    case BodyAnswer(_, bodyPartMap, _) =>
+      val bodyPartAndFeelings = for {
+        (bodyPartString, feelings) <- bodyPartMap
+        bodyPart = nameToBodyPart(bodyPartString)
+      } yield (bodyPart, feelings)
+      selectedBodyParts.clear()
+      selectedBodyParts ++ bodyPartAndFeelings
+      drawAllParts()
+      getView.invalidate()
+  }
+
+  override def getAnswerFromView: Option[Answer] = {
+    val values = selectedBodyParts.map{
+      case (bodyPart, answerList) =>
+        (bodyPartToName(bodyPart), answerList.map(_.toString))
+    }.mapValues(_.toList).toMap
+    Some(BodyAnswer("body_uuid", values))
+  }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/material_container"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:background="@color/blackoverlay"
+    >
+
+  <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:id="@+id/tab_icon"
+      fontPath="fonts/stroke.otf"
+      android:textSize="40sp"
+      android:gravity="center"
+      android:paddingTop="15dp"
+      android:paddingBottom="20dp"
+      android:textColor="@color/whiteabittransparent"
+      />
+
+</LinearLayout>
