@@ -18,7 +18,6 @@ import AndroidConversions._
 import TypedResource._
 import com.afollestad.materialdialogs.MaterialDialog.Callback
 import com.afollestad.materialdialogs.{Theme, MaterialDialogCompat, MaterialDialog}
-import com.google.android.gms.internal.di
 
 import scala.util.Try
 
@@ -87,9 +86,7 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
 
   var timerTask:TimerTask = makeTimerTask()
 
-  def makeTimerTask():TimerTask = () => ctx.runOnUiThread( new Runnable {
-    override def run(): Unit = { updateViewFromPlayer(player) }
-  })
+  def makeTimerTask():TimerTask = toTimerTask(() => ctx.runOnUiThread( () => updateViewFromPlayer(player)))
 
   def deleteAndResetToBeginning() = {
     deleteRecording()

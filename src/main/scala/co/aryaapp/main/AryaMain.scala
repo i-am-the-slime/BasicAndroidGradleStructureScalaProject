@@ -1,31 +1,19 @@
 package co.aryaapp.main
 
-import android.content.{Intent, Context}
-import android.graphics.Color
-import android.os.{AsyncTask, Bundle}
-import android.support.v4.app.{Fragment, FragmentPagerAdapter}
-import android.support.v4.widget.DrawerLayout
-import android.support.v4.widget.DrawerLayout.SimpleDrawerListener
-import android.support.v7.app.ActionBarActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
-import android.view
-import android.view.{ViewGroup, Menu, Gravity, View}
-import android.widget.TextView
+import android.content.Context
+import android.os.Bundle
 import co.aryaapp.TypedResource._
 import co.aryaapp.helpers.AndroidConversions._
-import co.aryaapp.helpers.{AndroidConversions, AryaBaseActivity}
+import co.aryaapp.helpers.{SlideIn, AryaBaseActivity}
 import co.aryaapp.journal.JournalActivity
-import co.aryaapp.main.fragments.{CustomiseFragment, HomeFragment}
 import co.aryaapp.view.ImageSlidingTabLayout
-import co.aryaapp.{TypedResource, R, TR}
+import co.aryaapp.{R, TR}
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 
 import scala.language.postfixOps
 
 
-class AryaMain extends AryaBaseActivity {
-  val activity = this
+class AryaMain extends AryaBaseActivity with SlideIn{
 
   lazy val viewPager = this.findView(TR.mainPager)
   lazy val slidingTabs:ImageSlidingTabLayout = this.findView(TR.slidingTabs)
@@ -58,18 +46,11 @@ class AryaMain extends AryaBaseActivity {
     true
   }
 
-//  def setupNavigation() = {
-//    navigationItems(0)
-//  }
-
   override def onCreate(savedInstanceState: Bundle) = {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
     setupViewPager()
     setupTabs()
-//    setupNavigation()
-//    setSupportActionBar(toolBar)
-//    startNewJournalActivity()
   }
 
 

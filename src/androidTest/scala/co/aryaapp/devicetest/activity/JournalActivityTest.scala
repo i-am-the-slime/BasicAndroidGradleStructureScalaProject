@@ -3,14 +3,15 @@ package co.aryaapp.devicetest.activity
 import android.graphics.drawable.ColorDrawable
 import android.test.suitebuilder.annotation.MediumTest
 import android.test.{TouchUtils, ActivityInstrumentationTestCase2, AndroidTestCase}
-import co.aryaapp.communication.TestJournal
+import co.aryaapp.communication._
+import co.aryaapp.helpers.AndroidConversions
 import co.aryaapp.{TypedResource, TR, R}
 import TypedResource._
 import co.aryaapp.journal.JournalActivity
-import co.aryaapp.devicetest.helper.KeyboardUtils
 import org.scalatest.Matchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.junit.AssertionsForJUnit
+import AndroidConversions._
 
 class JournalActivityTest extends ActivityInstrumentationTestCase2[JournalActivity](classOf[JournalActivity])
                 with AssertionsForJUnit
@@ -25,10 +26,16 @@ class JournalActivityTest extends ActivityInstrumentationTestCase2[JournalActivi
   def test_all():Unit = {
     val a = getActivity
     while(a.isThereNextPagerItem(a.pager, a.adapter))
-      a.nextButton.performClick()
+      a.runOnUiThread( () => a.nextButton.performClick() )
     val confirmButton = a.findView(TR.btn_confirm)
     val journal = a.adapter.saveJournals()
-    journal should not be TestJournal(List())
+    val expected = TestJournal(List(
+      SliderAnswer("ABCD", Map("question" -> 50)),
+      ListAnswer("dont know the uuid", List()),
+      TextAnswer("stupid_question_uuid",""),
+      BodyAnswer("body_uuid", Map())))
+
+    journal shouldBe expected
   }
 
 //  def test_isEmailValid_is_false_on_email_addresses_without_an_AT_sign():Unit = {

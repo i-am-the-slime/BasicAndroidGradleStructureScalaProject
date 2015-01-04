@@ -25,7 +25,7 @@ class Login extends OnboardingFragment{
 
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    getActivity.getLayoutInflater.inflate(R.layout.frag_onboarding_login, container, false)
+    inflater.inflate(R.layout.frag_onboarding_login, container, false)
   }
 
   override def onViewCreated(view: View, savedInstanceState: Bundle): Unit = {

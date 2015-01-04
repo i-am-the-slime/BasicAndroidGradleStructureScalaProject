@@ -56,10 +56,7 @@ class WhatHappenedFragment extends
   lazy val listItemAdapter = new WhatHappenedAdapter(listItems)
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    val view = getActivity.getLayoutInflater.inflate(R.layout.frag_journal_what_happened, container, false)
-//    view.findView(TR.plus_button).onClick(initiateAddNewItem())
-//    view.findView(TR.list_view).setAdapter(listAdapter)
-    view
+    inflater.inflate(R.layout.frag_journal_what_happened, container, false)
   }
 
   def addListItem(item:String) = {

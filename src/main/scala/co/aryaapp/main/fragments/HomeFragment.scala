@@ -8,6 +8,6 @@ import co.aryaapp.R
 class HomeFragment extends Fragment{
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
     super.onCreateView(inflater, container, savedInstanceState)
-    getActivity.getLayoutInflater.inflate(R.layout.frag_main_home, container, false)
+    inflater.inflate(R.layout.frag_main_home, container, false)
   }
 }

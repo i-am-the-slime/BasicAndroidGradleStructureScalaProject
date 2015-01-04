@@ -27,7 +27,7 @@ class WhatAreYouThinkingFragment extends
 
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    val view = getActivity.getLayoutInflater.inflate(R.layout.frag_journal_thoughts, container, false)
+    val view = inflater.inflate(R.layout.frag_journal_thoughts, container, false)
     val audioRecorderAndPlayerView = view.findView(TR.audio_recorder_and_player)
     val recorderPlayerController = new RecorderPlayerController(audioRecorderAndPlayerView)(getActivity)
     view

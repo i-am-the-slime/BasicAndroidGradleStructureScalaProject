@@ -13,7 +13,7 @@ import co.aryaapp._
 import co.aryaapp.helpers.AndroidConversions._
 import TypedResource._
 import co.aryaapp._
-import co.aryaapp.helpers.{AryaBaseActivity, Animations}
+import co.aryaapp.helpers.{SlideIn, AryaBaseActivity, Animations}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -23,7 +23,7 @@ object OnboardingActivity {
   val LOGIN_REQUEST_CODE = 1
   val REGISTER_REQUEST_CODE = 0
 }
-class OnboardingActivity extends AryaBaseActivity{
+class OnboardingActivity extends AryaBaseActivity {
   import co.aryaapp.onboarding.OnboardingActivity._
 
   def replaceFragment(f: => Fragment, name:String) {
@@ -90,7 +90,8 @@ class OnboardingActivity extends AryaBaseActivity{
 
   def loginFailed(f:Throwable, textField:TextView) = {
     f match {
-      case e:UnknownHostException => textField.setText("Make sure you have a working internet connection and try again please.")
+      case e:UnknownHostException =>
+        textField.setText("Make sure you have a working internet connection and try again please.")
     }
     Log.e("", f.getClass + f.getLocalizedMessage)
   }

@@ -16,7 +16,7 @@ object AryaBaseActivity {
   val exec = ExecutionContext.fromExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
-abstract class AryaBaseActivity extends ActionBarActivity{
+abstract class AryaBaseActivity extends ActionBarActivity {
   implicit val exec = AryaBaseActivity.exec
   implicit val ctx = this
 
@@ -27,19 +27,9 @@ abstract class AryaBaseActivity extends ActionBarActivity{
     size
   }
 
-  def getScreenWidth:Int = {
-    screenDimensions.x
-  }
+  def getScreenWidth:Int = screenDimensions.x
 
-  def getScreenHeight:Int = {
-    screenDimensions.y
-  }
-
-  override def onCreate(savedInstanceState: Bundle): Unit = {
-    super.onCreate(savedInstanceState)
-    getWindow.getAttributes.windowAnimations = R.style.SlideWindowAnimation
-  }
-
+  def getScreenHeight:Int = screenDimensions.y
 
   override def attachBaseContext(newBase:Context) = {
     super.attachBaseContext(new CalligraphyContextWrapper(newBase))
@@ -61,6 +51,10 @@ abstract class AryaBaseActivity extends ActionBarActivity{
     this.runOnUiThread(toRunnable(f))
   }
 
+}
+
+trait SlideIn extends Activity {
+
   override def startActivity(intent: Intent): Unit = {
     super.startActivity(intent)
     overridePendingTransition(R.anim.move_up, R.anim.nothing)
@@ -70,7 +64,9 @@ abstract class AryaBaseActivity extends ActionBarActivity{
     super.startActivity(intent, options)
     overridePendingTransition(R.anim.move_up, R.anim.nothing)
   }
+}
 
+trait SlideOut extends Activity {
   override def finish() = {
     super.finish()
     overridePendingTransition(R.anim.nothing, R.anim.move_down)

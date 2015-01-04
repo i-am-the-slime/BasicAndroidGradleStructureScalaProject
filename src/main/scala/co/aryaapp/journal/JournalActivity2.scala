@@ -5,15 +5,14 @@ import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
-import co.aryaapp.{R, TR, TypedResource}
+import co.aryaapp.TypedResource._
+import co.aryaapp.helpers.AndroidConversions._
 import co.aryaapp.helpers._
-import language.postfixOps
-import TypedResource._
-import AndroidConversions._
+import co.aryaapp.{R, TR, TypedResource}
 
-import scala.concurrent.Future
+import scala.language.postfixOps
 
-class JournalActivity extends AryaBaseActivity with SlideIn with SlideOut{
+class JournalActivity2 extends AryaBaseActivity with SlideIn with SlideOut{
   lazy val pager = this.findView(TR.journalViewPager)
   lazy val adapter = new JournalPagerAdapter(getSupportFragmentManager, pager.getId)
   lazy val closeButton = this.findView(TR.closeButton)

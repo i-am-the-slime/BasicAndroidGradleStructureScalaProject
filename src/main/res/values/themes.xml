@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="Theme.Arya" parent="@style/Theme.AppCompat.NoActionBar">
+  <style name="Theme.Arya.Base" parent="@style/Theme.AppCompat.NoActionBar">
     <item name="colorPrimary">@color/arya</item>
     <item name="colorPrimaryDark">@color/arya_dark</item>
     <item name="colorAccent">@color/arya_light</item>
@@ -13,6 +13,8 @@
     <item name="colorControlActivated">@color/arya</item>
     <item name="colorControlHighlight">@color/arya</item>
   </style>
+
+  <style name="Theme.Arya" parent="Theme.Arya.Base" />
 
   <style name="Theme.Arya.Journal" parent="@style/Theme.Arya">
     <item name="android:windowIsTranslucent">true</item>

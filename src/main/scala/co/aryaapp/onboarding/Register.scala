@@ -2,7 +2,6 @@ package co.aryaapp.onboarding
 
 import java.net.UnknownHostException
 
-import android.app.Activity
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.util.Log
@@ -29,7 +28,7 @@ class Register extends OnboardingFragment{
 
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    getActivity.getLayoutInflater.inflate(R.layout.frag_onboarding_register, container, false)
+    inflater.inflate(R.layout.frag_onboarding_register, container, false)
   }
 
   override def onViewCreated(view: View, savedInstanceState: Bundle): Unit = {
@@ -40,7 +39,7 @@ class Register extends OnboardingFragment{
       if(focused)
         errorLabel.setVisibility(View.GONE)
       else
-      if(!focused) changeInvalidEditTextToRed(v.asInstanceOf[EditText], isEmailValid)
+        if(!focused) changeInvalidEditTextToRed(v.asInstanceOf[EditText], isEmailValid)
     )
     val parent = view.getParent.asInstanceOf[View]
   }

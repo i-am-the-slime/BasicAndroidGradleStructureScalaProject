@@ -18,7 +18,7 @@ class HowDidYouReactFragment extends
   lazy val answerEditText = getView.findView(TR.reaction)
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    getActivity.getLayoutInflater.inflate(R.layout.frag_journal_your_reaction, container, false)
+    inflater.inflate(R.layout.frag_journal_your_reaction, container, false)
   }
 
   override def populateViewFromAnswer(answer: Answer): Unit = answer match {

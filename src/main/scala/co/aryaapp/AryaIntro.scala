@@ -16,13 +16,7 @@ import scala.language.postfixOps
 import scala.util.{Failure, Success}
 import scala.collection.JavaConversions._
 
-case class Shit(s:String, yeah:Int)
-object Shit{
-  implicit def ShitCodecJson:CodecJson[Shit] =
-    casecodec2(Shit.apply, Shit.unapply)("s", "yeah")
-}
-
-class AryaIntro extends AryaBaseActivity{
+class AryaIntro extends AryaBaseActivity {
   import co.aryaapp.AryaIntro._
 
   override def onActivityResult(requestCode: Int, resultCode: Int, data: Intent): Unit = {
@@ -65,7 +59,7 @@ class AryaIntro extends AryaBaseActivity{
           Log.e("MOTHER", s"Post result is $s")
           val result= client.getFromServer[GetNotes]("/user/notes")
           result.onComplete{
-            case Success(s) => Log.e("MOTHER", s"Get result is $s")
+            case Success(su) => Log.e("MOTHER", s"Get result is $su")
             case Failure(f) => Log.e("MOTHER", "Error is " + f.getMessage)
           }
         case Failure(f) => Log.e("MOTHER", "Error is " + f.getMessage)

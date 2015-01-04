@@ -17,7 +17,7 @@ class HowAreYouFeelingFragment extends
     R.string.frag_how_are_you_feeling_subtitle) {
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    getActivity.getLayoutInflater.inflate(R.layout.frag_journal_feeling, container, false)
+    inflater.inflate(R.layout.frag_journal_feeling, container, false)
   }
 
   lazy val sliders = {

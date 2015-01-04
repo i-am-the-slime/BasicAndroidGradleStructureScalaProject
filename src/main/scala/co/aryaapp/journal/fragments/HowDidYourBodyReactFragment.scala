@@ -32,7 +32,7 @@ class HowDidYourBodyReactFragment extends
   def getTouchImage(v:View) = v.findView(TR.touch_image)
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    val view = getActivity.getLayoutInflater.inflate(R.layout.frag_journal_body, container, false)
+    val view = inflater.inflate(R.layout.frag_journal_body, container, false)
     //Set it up such that when clicking on body picture we check the
     val touchImage = getTouchImage(view)
     val referenceImage = view.findView(TR.colour_image)

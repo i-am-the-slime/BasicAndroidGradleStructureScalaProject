@@ -130,14 +130,14 @@ object AndroidConversions {
       .asInstanceOf[InputMethodManager]
       .hideSoftInputFromWindow(fromView.getWindowToken, 0)
 
-  implicit def toFocusChangedListener(f:(View, Boolean) => Unit) = new OnFocusChangeListener {
+  implicit def toFocusChangedListener(f:(View, Boolean) => Unit): OnFocusChangeListener with Object {def onFocusChange(v: View, hasFocus: Boolean): Unit} = new OnFocusChangeListener {
       override def onFocusChange(v: View, hasFocus: Boolean): Unit = f(v, hasFocus)
   }
 
-  implicit def toOnCompletionListener[A](f: (MediaPlayer) => A) =
+  implicit def toOnCompletionListener[A](f: (MediaPlayer) => A): OnCompletionListener with Object {def onCompletion(mp: MediaPlayer): Unit} =
     new OnCompletionListener { override def onCompletion(mp: MediaPlayer): Unit = f(mp) }
 
-  implicit def toTimerTask[A](f: () => A) = new TimerTask() { override def run() = f() }
+  def toTimerTask[A](f: () => A): TimerTask {def run(): Unit} = new TimerTask() { override def run() = f() }
   /* End Mark's stuff */
 
   implicit def toRunnable[A](f: () => A): Runnable with Object {def run(): Unit} = new Runnable() { override def run() = f() }

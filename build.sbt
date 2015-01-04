@@ -21,9 +21,9 @@ proguardCache in Android ++= Seq(
 )
 
 resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
   "jcenter" at "http://jcenter.bintray.com",
-  "clinker" at "http://clinker.47deg.com/nexus/content/groups/public"
+  "clinker" at "http://clinker.47deg.com/nexus/content/groups/public",
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 )
 
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
@@ -31,40 +31,65 @@ addCompilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.fu
 unmanagedClasspath in Test ++= (builder in Android).value.getBootClasspath map
   Attributed.blank
 
+// Testing with Robolectric
+libraryDependencies ++= Seq(
+  "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % "test"
+  , "org.robolectric" % "robolectric" % "2.4" % "test->default"
+  , "com.novocode" % "junit-interface" % "0.11" % "test"
+  , "junit" % "junit" % "4.11" % "test"
+)
+
+// Testing without Robolectric
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "2.2.0"
+  , "org.scalamock" %% "scalamock-scalatest-support" % "3.1.2"
+)
+
+//Crazy stuff
+libraryDependencies += "com.chuusai" %% "shapeless" % "2.0.0"
+
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.1.0"
+
+libraryDependencies += "org.scala-stm" %% "scala-stm" % "0.7"
+
+// AppCompat
 libraryDependencies ++= Seq(
   "com.android.support" % "support-v4" % "21.0.3"
-  , "org.apache.maven" % "maven-ant-tasks" % "2.1.3" % "test"
-  , "org.robolectric" % "robolectric" % "2.4" % "test->default"
-  , "junit" % "junit" % "4.11" % "test"
-  , "com.novocode" % "junit-interface" % "0.11" % "test"
-  , aar("com.afollestad" % "material-dialogs" % "0.3.0")
-  , aar("com.balysv" % "material-ripple" % "1.0.5-SNAPSHOT")
-  , aar("com.balysv.materialmenu" % "material-menu-toolbar" % "1.4.0")
-  , "com.nineoldandroids" % "library" % "2.4.0"
   , aar("com.android.support" % "appcompat-v7" % "21.0.3")
-  , aar("com.android.support" % "gridlayout-v7" % "21.0.3")
-  , aar("com.github.dmytrodanylyk.circular-progress-button" % "library" % "1.1.3")
-  , aar("com.android.support" % "palette-v7" % "21.0.3")
-  , aar("com.android.support" % "cardview-v7" % "21.0.3")
+//  , aar("com.android.support" % "gridlayout-v7" % "21.0.3")
+//  , aar("com.android.support" % "palette-v7" % "21.0.3")
+//  , aar("com.android.support" % "cardview-v7" % "21.0.3")
   , aar("com.android.support" % "recyclerview-v7" % "21.0.3")
-  , "com.squareup.picasso" % "picasso" % "2.3.4"
-  , aar("com.google.android.gms" % "play-services" % "6.1.11")
-  , "uk.co.chrisjenx" % "calligraphy" % "1.2.0"
-  , "com.squareup.okhttp" % "okhttp-urlconnection" % "2.0.0"
-  , "com.squareup.okhttp" % "okhttp" % "2.0.0"
-  , "io.argonaut" %% "argonaut" % "6.1-M4"
-  , "org.sqldroid" % "sqldroid" % "1.0.3"
-  , "com.scalarx" %% "scalarx" % "0.2.6"
-  , "org.slf4j" % "slf4j-nop" % "1.6.4"
-  , "com.typesafe.slick" %% "slick" % "2.1.0"
+)
+
+//Basics
+libraryDependencies ++= Seq(
+  "uk.co.chrisjenx" % "calligraphy" % "1.2.1-SNAPSHOT"
+  , "com.nineoldandroids" % "library" % "2.4.0"
   , "joda-time" % "joda-time" % "2.4"
   , "org.joda" % "joda-convert" % "1.6"
-  , "com.github.tototoshi" %% "slick-joda-mapper" % "1.2.0"
-  , "org.scalatest" %% "scalatest" % "2.2.0"
-  , "org.scalamock" %% "scalamock-scalatest-support" % "3.1.2"
-  , "org.scala-lang" %% "scala-pickling" % "0.9.0"
-  , "com.typesafe.play" %% "play-json" % "2.3.4"
+  , "com.squareup.okhttp" % "okhttp-urlconnection" % "2.0.0"
+  , "com.squareup.okhttp" % "okhttp" % "2.0.0"
+)
+
+//JSON
+libraryDependencies ++= Seq(
+  "io.argonaut" %% "argonaut" % "6.1-M4"
   , "co.aryaapp" %% "macros" % "1.2"
+)
+
+//Database (Slick)
+libraryDependencies ++= Seq(
+  "org.slf4j" % "slf4j-nop" % "1.6.4"
+  , "com.typesafe.slick" %% "slick" % "2.1.0"
+  , "com.github.tototoshi" %% "slick-joda-mapper" % "1.2.0"
+  , "org.sqldroid" % "sqldroid" % "1.0.3"
+)
+
+//Material backports
+libraryDependencies ++= Seq(
+  aar("com.afollestad" % "material-dialogs" % "0.3.0") // Material Dialogs
+  , aar("com.balysv" % "material-ripple" % "1.0.5-SNAPSHOT") //Material effect
 )
 
 scalacOptions in (Compile, compile) ++= Seq(

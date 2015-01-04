@@ -15,7 +15,7 @@ class DoneFragment(jpa:JournalPagerAdapter) extends JournalBaseFragment(
   lazy val confirmButton = getView.findView(TR.btn_confirm)
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-    getActivity.getLayoutInflater.inflate(R.layout.frag_journal_done, container, false)
+    inflater.inflate(R.layout.frag_journal_done, container, false)
   }
 
   override def onViewCreated(view: View, savedInstanceState: Bundle): Unit = {
