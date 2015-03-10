@@ -1,14 +1,10 @@
 package co.aryaapp.view
 
 import android.content.Context
-import android.support.v4.view.ViewPager
-import android.util.{Log, AttributeSet}
-import android.view.{LayoutInflater, View}
+import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup.LayoutParams.{MATCH_PARENT => Match, WRAP_CONTENT => Wrap}
-import android.widget.HorizontalScrollView
-import co.aryaapp.{SlidingTabLayout, SlidingTabStrip}
-import scalaz._, Scalaz._
-
+import co.aryaapp.java.SlidingTabLayout
 
 class ImageSlidingTabLayout(ctx:Context, attrs:AttributeSet, style:Int) extends SlidingTabLayout(ctx, attrs, style) {
   def this(c:Context, a:AttributeSet) = this(c, a, 0)

@@ -1,12 +1,5 @@
 package co.aryaapp
 
-import android.content.Intent
-import android.test._
-import android.test.suitebuilder.annotation.{SmallTest, MediumTest}
-import co.aryaapp.onboarding.Login
-import org.scalatest.Matchers
-import org.scalatest.junit.AssertionsForJUnit
-
 //class LoginUnitTest extends ActivityUnitTestCase[Login](classOf[Login])
 //                with AssertionsForJUnit
 //                with Matchers

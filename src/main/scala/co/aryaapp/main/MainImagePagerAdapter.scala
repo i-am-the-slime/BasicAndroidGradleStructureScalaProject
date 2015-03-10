@@ -1,7 +1,6 @@
 package co.aryaapp.main
 
-import android.support.v4.app.{FragmentManager, Fragment, FragmentPagerAdapter}
-import android.view.ViewGroup
+import android.support.v4.app.{Fragment, FragmentManager, FragmentPagerAdapter}
 import co.aryaapp.main.fragments.{CustomiseFragment, HomeFragment}
 
 class MainImagePagerAdapter(fm:FragmentManager) extends FragmentPagerAdapter(fm){

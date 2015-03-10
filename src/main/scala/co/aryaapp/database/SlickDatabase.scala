@@ -1,12 +1,11 @@
 package co.aryaapp.database
 
 import android.content.Context
-import co.aryaapp.communication.{Question, JournalPage, Journal, JournalEntry}
+import argonaut.Argonaut._
+import co.aryaapp.communication.DataTypes.{Journal, JournalEntry}
 
-import scala.slick.driver.SQLiteDriver
 import scala.slick.driver.SQLiteDriver.simple._
 import scala.slick.jdbc.meta.MTable
-import argonaut._, Argonaut._
 
 class SlickDatabase(implicit ctx:Context) {
   val Driver = "org.sqldroid.SQLDroidDriver"
@@ -25,23 +24,26 @@ class SlickDatabase(implicit ctx:Context) {
   }
   val journals = TableQuery[JournalsTable]
 
-  def addJournal(journal:Journal) = {
+  def addJournal(journal:Journal) : Unit = {
     db withTransaction { implicit session =>
       val journalUuid= JournalUUID(journal.uuid)
-      if( !journals.filter(_.uuid === journalUuid).exists.run )
-        journals += (JournalUUID(journal.uuid), journal.asJson.nospaces)
+      if( !journals.filter(_.uuid === journalUuid).exists.run ) {
+        journals += ((journalUuid, journal.asJson.nospaces))
+      }
     }
+    ()
   }
 
-  def deleteJournal(journal:Journal) = {
+  def deleteJournal(journal:Journal): Unit = {
     db withTransaction { implicit session =>
       val journalUuid = JournalUUID(journal.uuid)
       journals.filter(_.uuid === journalUuid).delete
     }
+    ()
   }
 
   def getJournal(uuid:String):Option[Journal] = {
-    db withTransaction { implicit session =>
+    db withTransaction { implicit session ⇒
       journals.filter(_.uuid === JournalUUID(uuid)).firstOption.flatMap{
         case (_, json) => json.decodeOption[Journal]
       }
@@ -66,21 +68,22 @@ class SlickDatabase(implicit ctx:Context) {
 
   def fetchJournalEntries():List[JournalEntry] = {
     for {
-      (_, uuid, createdAt, updatedAt, jsonAnswers, _) <- db withSession { implicit session => journalEntries.list }
-      answers <- jsonAnswers.decodeOption[Map[String, Map[String, String]]]
+      (_, uuid, createdAt, updatedAt, jsonAnswers, _) ← db withSession { implicit session ⇒ journalEntries.list }
+      answers ← jsonAnswers.decodeOption[Map[String, Map[String, String]]]
     } yield JournalEntry(uuid, createdAt, updatedAt, answers)
   }
 
   def saveJournalEntry(je:JournalEntry):Unit = {
-    db withSession { implicit session =>
-        journalEntries += (0, je.journalUuid, je.createdAt, je.updatedAt, je.answers.asJson.nospaces, false)
+    db withSession { implicit session ⇒
+        journalEntries += ((0, je.journalUuid, je.createdAt, je.updatedAt, je.answers.asJson.nospaces, false))
     }
+    () //TODO: Check if there is a way to return an option or something instead
   }
 
   /* Create any tables that don't exist yet */
   db withSession {
     val ddl = journals.ddl ++ journalEntries.ddl
-    implicit session => {
+    implicit session ⇒ {
       if (MTable.getTables(JournalsTableName).list.isEmpty){
         ddl.create
       }

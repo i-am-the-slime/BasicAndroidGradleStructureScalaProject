@@ -1,23 +1,21 @@
 package co.aryaapp.journal.audio
 
 import java.io.File
-import java.util.{TimerTask, Timer}
+import java.util.{Timer, TimerTask}
 
-import android.app.{AlertDialog, Activity}
-import android.content.DialogInterface
-import android.content.DialogInterface.OnClickListener
+import android.app.Activity
 import android.media.{MediaPlayer, MediaRecorder}
 import android.os.Environment
 import android.util.Log
 import android.view.{View, ViewGroup}
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import co.aryaapp.TypedResource._
+import co.aryaapp.helpers.AndroidConversions._
+import co.aryaapp.helpers.{AndroidConversions, Animations}
 import co.aryaapp.{R, TR, TypedResource}
-import co.aryaapp.helpers.{Animations, AndroidConversions}
-import AndroidConversions._
-import TypedResource._
 import com.afollestad.materialdialogs.MaterialDialog.Callback
-import com.afollestad.materialdialogs.{Theme, MaterialDialogCompat, MaterialDialog}
+import com.afollestad.materialdialogs.{MaterialDialog, Theme}
 
 import scala.util.Try
 
@@ -37,7 +35,7 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
 
   seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener {
 
-    override def onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean): Unit = Unit
+    override def onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean): Unit = ()
 
     override def onStopTrackingTouch(seekBar: SeekBar): Unit = {
       updatePlayerFromView()
@@ -51,6 +49,7 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
 
     override def onStartTrackingTouch(seekBar: SeekBar): Unit = {
       timerTask.cancel()
+      ()
     }
   })
 
@@ -86,7 +85,9 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
 
   var timerTask:TimerTask = makeTimerTask()
 
-  def makeTimerTask():TimerTask = toTimerTask(() => ctx.runOnUiThread( () => updateViewFromPlayer(player)))
+  def makeTimerTask():TimerTask = toTimerTask(() => ctx.runOnUiThread( new Runnable {
+    override def run(): Unit = { updateViewFromPlayer(player) }
+  }))
 
   def deleteAndResetToBeginning() = {
     deleteRecording()
@@ -102,11 +103,12 @@ class RecorderPlayerController(container:ViewGroup)(implicit val ctx:Activity) {
 
   def record() = {
     startRecording()
-    def recordingCancelled() {
+    def recordingCancelled():Unit = {
       stopRecording()
       deleteRecording()
+      ()
     }
-    def recordingAccepted() {
+    def recordingAccepted():Unit = {
       Log.e("MOTHER", "recording accepted")
       stopRecording()
       recordButton.setVisibility(View.GONE)

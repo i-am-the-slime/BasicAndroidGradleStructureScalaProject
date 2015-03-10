@@ -3,20 +3,16 @@ package co.aryaapp.onboarding
 import java.net.UnknownHostException
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import co.aryaapp.TypedResource._
 import co.aryaapp._
-import co.aryaapp.helpers.AndroidConversions._
-import TypedResource._
-import co.aryaapp._
-import co.aryaapp.helpers.{SlideIn, AryaBaseActivity, Animations}
+import co.aryaapp.helpers.{Animations, AryaBaseActivity}
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 
 object OnboardingActivity {
@@ -24,14 +20,13 @@ object OnboardingActivity {
   val REGISTER_REQUEST_CODE = 0
 }
 class OnboardingActivity extends AryaBaseActivity {
-  import co.aryaapp.onboarding.OnboardingActivity._
 
-  def replaceFragment(f: => Fragment, name:String) {
+  def replaceFragment(f: => Fragment, name:String):Unit = {
     val frame = this.findView(TR.frame)
     frame.startAnimation(Animations.moveDownAndOut(frame, 600, 0).andThen(_ => reallyReplaceFragment(f, name)))
   }
 
-  def popFragment() {
+  def popFragment():Unit = {
     val frame = this.findView(TR.frame)
     frame.startAnimation(Animations.moveDownAndOut(frame, 600, 0).andThen(_ => reallyPopFragment()))
   }
@@ -86,6 +81,7 @@ class OnboardingActivity extends AryaBaseActivity {
       .setCustomAnimations(R.anim.move_up, R.anim.move_down)
       .add(R.id.frame, new StartFragment)
       .commit()
+    ()
   }
 
   def loginFailed(f:Throwable, textField:TextView) = {

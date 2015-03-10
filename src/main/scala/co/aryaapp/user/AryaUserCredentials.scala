@@ -1,11 +1,10 @@
 package co.aryaapp.user
 
-import android.content.{Context, SharedPreferences}
+import android.content.Context
 import android.os.AsyncTask
 import android.preference.PreferenceManager
-import com.squareup.okhttp.{MediaType, RequestBody, Request, OkHttpClient}
 
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.ExecutionContext
 
 object AryaUserCredentials {
   val OAUTH_ACCESS_TOKEN = "oauth_access_token"

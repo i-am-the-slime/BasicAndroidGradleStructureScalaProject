@@ -1,13 +1,10 @@
 package co.aryaapp.main
 
-import android.content.Context
-import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
-import android.view.{View, LayoutInflater, ViewGroup}
-import android.widget.LinearLayout
+import android.view.{LayoutInflater, View, ViewGroup}
+import co.aryaapp.TypedResource._
 import co.aryaapp.helpers.AndroidConversions._
-import co.aryaapp.{TR, TypedResource, R}
-import TypedResource._
+import co.aryaapp.{R, TR}
 
 case class MenuItem(title:String, icon:String, callback:(View) => Unit)
 

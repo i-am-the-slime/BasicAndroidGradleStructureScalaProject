@@ -8,7 +8,7 @@ object AryaDB {
     type ColumnType = Value
     val INTEGER, REAL, TEXT, TEXT_NOT_NULL, BLOB = Value
   }
-  import ColumnType._
+  import co.aryaapp.database.AryaDB.ColumnType._
 
   /** GENERAL */
   val DB_NAME = "aryadb"
@@ -33,7 +33,7 @@ object AryaDB {
   } + ")"
 }
 
-import AryaDB._
+import co.aryaapp.database.AryaDB._
 
 class AryaDB(implicit val ctx:Context)
   extends SQLiteOpenHelper(ctx, DB_NAME, null, DB_VERSION) {

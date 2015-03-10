@@ -4,7 +4,7 @@ import java.net.UnknownHostException
 
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.view.{ViewGroup, LayoutInflater, View}
+import android.view.{LayoutInflater, View, ViewGroup}
 import android.widget.EditText
 import co.aryaapp.TypedResource._
 import co.aryaapp._

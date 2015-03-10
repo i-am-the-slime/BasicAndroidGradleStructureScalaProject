@@ -1,139 +1,158 @@
 package co.aryaapp.communication
 import argonaut._, Argonaut._
-import co.aryaapp.macros.Macros._
+import co.aryaapp.communication.DataTypes.Question
+import co.aryaapp.macros.Macros.argonaut
 
-import java.util.{List => JavaList}
+object DataTypes {
+  @argonaut case class ThemeContainer(themes:List[Theme])
+  @argonaut case class Theme(uuid:String, color:String, wallpaper:String, createdAt:String, updatedAt:String)
 
-import argonaut.CodecJson
+  @argonaut case class GetNotes(notes:List[Note]) //Has an s and is a list
+  @argonaut case class PostNoteResult(notes:Note) //Has a fucking s
+  @argonaut case class Note(content:String)
 
-case class ThemeContainer(themes:JavaList[Theme])
-case class Theme(uuid:String, color:String, wallpaper:String, created_at:String, updated_at:String)
+  @argonaut case class GetJournals(journals:List[Journal])
+  @argonaut case class PostJournal(journal:Journal)
+  @argonaut case class PostJournalResult(journals:Journal)
 
-@argonaut case class GetNotes(notes:List[Note]) //Has an s and is a list
-@argonaut case class PostNoteResult(notes:Note) //Has a fucking s
-@argonaut case class Note(content:String)
+  @argonaut case class PostUser(user:User)
+  @argonaut case class PostUserResult(users:User)
+  @argonaut case class GetUser(user:User)
 
-case class GetJournals(journals:List[Journal])
-case class PostJournal(journal:Journal)
-case class PostJournalResult(journals:Journal)
+  @argonaut case class PostNewUser(user:NewUser)
+  @argonaut case class NewUser(email:String, passwordHash:String)
 
-@argonaut case class TestJournal(answers:List[Answer])
-
-abstract class Answer { def typ:String }
-case class SliderAnswer(question:String, values:Map[String, Int], typ:String=SliderAnswer.typ) extends Answer
-object SliderAnswer{
-  val typ = "slider_answer"
-  implicit def codec: CodecJson[SliderAnswer] =
-    casecodec3(SliderAnswer.apply, SliderAnswer.unapply)("question", "values", "type")
-}
-case class ListAnswer (question:String, values:List[String], typ:String=ListAnswer.typ) extends Answer
-object ListAnswer{
-  val typ = "list_answer"
-  implicit def codec: CodecJson[ListAnswer] =
-    casecodec3(ListAnswer.apply, ListAnswer.unapply)("question", "values", "type")
-}
-case class TextAnswer(question:String, values:String, typ:String=ListAnswer.typ) extends Answer
-object TextAnswer{
-  val typ = "text_answer"
-  implicit def codec: CodecJson[TextAnswer] =
-    casecodec3(TextAnswer.apply, TextAnswer.unapply)("question", "values", "type")
-}
-case class BodyAnswer(question:String, values:Map[String, List[String]], typ:String=BodyAnswer.typ) extends Answer
-object BodyAnswer{
-  val typ = "body_answer"
-  implicit def codec: CodecJson[BodyAnswer] =
-    casecodec3(BodyAnswer.apply, BodyAnswer.unapply)("question", "values", "type")
-}
-
-object Answer{
-  implicit def AnswerCodecJson:CodecJson[Answer] =
-  CodecJson({
-    case a:SliderAnswer => a.asJson
-    case a:ListAnswer  => a.asJson
-    case a:TextAnswer  => a.asJson
-    case a:BodyAnswer => a.asJson
-  },
-  j => {
-    val typ = (j --\ "type").as[String].getOr("motherfucker_you_spell_wrong")
-    typ match {
-      case SliderAnswer.typ => SliderAnswer.codec(j).map[Answer](identity)
-      case ListAnswer.typ => ListAnswer.codec(j).map[Answer](identity)
-      case TextAnswer.typ => TextAnswer.codec(j).map[Answer](identity)
-      case BodyAnswer.typ => BodyAnswer.codec(j).map[Answer](identity)
-    }
-  }
-  )
-}
-
-@argonaut case class PostUser(user:User)
-@argonaut case class PostUserResult(users:User)
-
-@argonaut case class User(email:String, passwordHash:String)
-
-sealed trait Question {
-  def typ:String
-  def uuid:String
-}
-
-object Question{
-  implicit def QuestionCodecJson:CodecJson[Question] =
-    CodecJson({
-      case q: SliderQuestion => q.asJson
-      case q: CheckboxesQuestion => q.asJson
-      case q: BodyQuestion => q.asJson
-      case q: SoundQuestion => q.asJson
-      case q: TextQuestion => q.asJson
-    } ,
-      j => {
-        val typ = (j --\ "type").as[String].getOr("motherfucker_you_spell_wrong")
-        typ match {
-          case SliderQuestion.typ => SliderQuestion.SliderQuestionCodecJson(j).map[Question](identity)
-          case TextQuestion.typ => TextQuestion.TextQuestionCodecJson(j).map[Question](identity)
-          case CheckboxesQuestion.typ => CheckboxesQuestion.CheckboxesQuestionCodecJson(j).map[Question](identity)
-          case BodyQuestion.typ => BodyQuestion.BodyQuestionCodecJson(j).map[Question](identity)
-          case SoundQuestion.typ => SoundQuestion.SoundQuestionCodecJson(j).map[Question](identity)
-        }
-      }
+  @argonaut case class User(
+    uuid:String,
+    email:String,
+    createdAt:String,
+    updatedAt:String,
+    fullname:Option[String],
+    gender:String,
+    public:Boolean,
+    professional:Boolean,
+    achievementsCount:Int,
+    activitiesCount:Int,
+    activitiesUnreadCount:Int,
+    invitesCount:Int,
+    invitesPendingCount:Int,
+    journalsCount:Int,
+    notesCount:Int,
+    links:Map[String, String],
+    questions:List[Question],
+    theme:Theme
     )
+
+
+  sealed trait UserData
+
+  case class Question(
+    uuid:String,
+    title:String,
+    description:String,
+    view:String,
+  //  autocompletes:Boolean,
+    keywords:List[String],
+    userData:UserData
+  )
+
+
+  object Question {
+//    def apply(uuid:String, title:String, description:String, view:String, keywords:List[String], userDataString:String): Option[Question] = {
+//      val ud = view match {
+//        case "sliders" ⇒ userDataString.decodeOption[UserDataSlider]
+//        case "list" ⇒ userDataString.decodeOption[UserDataList]
+//        case "images" ⇒ userDataString.decodeOption[UserDataImages]
+//        case "audio_text" ⇒ userDataString.decodeOption[UserDataAudioText]
+//        case "text" ⇒ userDataString.decodeOption[UserDataText]
+//        case _ ⇒ None
+//      }
+//      for (userData ← ud) yield Question(uuid, title, description, view, keywords, userData)
+//    }
+
+    def jsonFromUserData(v:String, ud:UserData) = {
+      v match {
+        case "sliders" ⇒ ud.asInstanceOf[UserDataSlider].asJson
+        case "list" ⇒ ud.asInstanceOf[UserDataList].asJson
+        case "images" ⇒ ud.asInstanceOf[UserDataImages].asJson
+        case "audio-text" ⇒ ud.asInstanceOf[UserDataAudioText].asJson
+        case "text" ⇒ ud.asInstanceOf[UserDataText].asJson
+      }
+
+    }
+
+    implicit def QuestionEncodeCodecJson:EncodeJson[Question] =
+      EncodeJson( (q:Question) ⇒ {
+        val userDataJson = jsonFromUserData(q.view, q.userData)
+        ("uuid" := q.uuid) ->: ("title" := q.title) ->: ("description" := q.description) ->: ("view" := q.view) ->:
+          ("keywords" := q.keywords) ->: ("user_data" := userDataJson) ->: jEmptyObject
+//
+//        (q.uuid, q.title, q.description, q.view, q.keywords, ud)
+//        ("uuid", "title", "description", "view", "keywords", "user_data")
+    })
+
+    implicit def QuestionDecodeCodecJson:DecodeJson[Question] = DecodeJson(c ⇒ for {
+      uuid ← (c --\ "uuid").as[String]
+      title ← (c --\ "title").as[String]
+      description ← (c --\ "description").as[String]
+      view ← (c --\ "view").as[String]
+      keywords ← (c --\ "keywords").as[List[String]]
+      userData ← view match {
+        case "sliders" ⇒ (c --\ "user_data").as[UserDataSlider]
+        case "list" ⇒ (c --\ "user_data").as[UserDataList]
+        case "images" ⇒ (c --\ "user_data").as[UserDataImages]
+        case "text" ⇒ (c --\ "user_data").as[UserDataText]
+        case "audio-text" ⇒ (c --\ "user_data").as[UserDataAudioText]
+        case _ ⇒ DecodeResult.fail[UserData]("View field did not match any valid userData type.", c.history)
+      }
+    } yield Question(uuid, title, description, view, keywords, userData)
+    )
+  }
+
+  @argonaut case class SliderOption(title:String, identifier:String, minValue:Int, maxValue:Int, defaultValue:Int/*, legend:List[String], steps:Int*/)
+
+  case class UserDataSlider(options:List[SliderOption]) extends UserData
+  object UserDataSlider{
+    val view = "sliders"
+    implicit def UserDataSliderCJ: CodecJson[UserDataSlider] =
+      casecodec1(UserDataSlider.apply, UserDataSlider.unapply)("options")
+  }
+
+  case object UserDataList extends UserData {
+    val view = "list"
+    implicit def UserDataListCJ: CodecJson[UserDataList] =
+      casecodec2(UserDataList.apply, UserDataList.unapply)("autocompletes", "defaults")
+  }
+  case class UserDataList(autocompletes:Boolean, defaults:List[String]) extends UserData
+
+  @argonaut case class Frame(x:Int, y:Int, width:Int, height:Int)
+  @argonaut case class ImagesImage(frame:Frame, identifier:String, options:List[String], url:String)
+
+  case class UserDataImages(images:List[ImagesImage]) extends UserData
+  object UserDataImages {
+    val view = "images"
+    implicit def UserDataImagesCJ: CodecJson[UserDataImages] =
+      casecodec1(UserDataImages.apply, UserDataImages.unapply)("images")
+  }
+
+  object UserDataAudioText {
+    val view = "audio-text"
+    implicit def UserDataAudioTextCJ: CodecJson[UserDataAudioText] =
+      casecodec1(UserDataAudioText.apply, UserDataAudioText.unapply)("placeholder")
+  }
+
+  case class UserDataAudioText(placeholder:String) extends UserData
+
+  case class UserDataText(placeholder:String) extends UserData
+
+  object UserDataText {
+    val view = "text"
+    implicit def UserDataTextCJ: CodecJson[UserDataText] =
+      casecodec1(UserDataText.apply, UserDataText.unapply)("placeholder")
+  }
+
+  @argonaut case class JournalPage(uuid:String, title:String, subtitle:String, questions:List[Question])
+  @argonaut case class Journal(uuid:String, createdAt:String, updatedAt:String, pages:List[JournalPage])
+  @argonaut case class JournalEntry(journalUuid:String, createdAt:String, updatedAt:String, answers:Map[String, Map[String, String]])
+
 }
-
-case class SliderQuestion(uuid:String, name:String, min:Float, max:Float, typ:String=SliderQuestion.typ) extends Question
-object SliderQuestion{
-  val typ = "slider_question"
-  implicit def SliderQuestionCodecJson: CodecJson[SliderQuestion] =
-    casecodec5(SliderQuestion.apply, SliderQuestion.unapply)("uuid", "name", "min", "max", "type")
-}
-
-case class TextQuestion(uuid:String, name:String, typ:String=TextQuestion.typ) extends Question
-object TextQuestion{
-  val typ = "text_question"
-  implicit def TextQuestionCodecJson: CodecJson[TextQuestion] =
-    casecodec3(TextQuestion.apply, TextQuestion.unapply)("uuid", "name", "type")
-}
-
-case class CheckboxesQuestion(uuid:String, name:String, typ:String=CheckboxesQuestion.typ) extends Question
-object CheckboxesQuestion{
-  val typ = "checkboxes_question"
-  implicit def CheckboxesQuestionCodecJson: CodecJson[CheckboxesQuestion] =
-    casecodec3(CheckboxesQuestion.apply, CheckboxesQuestion.unapply)("uuid", "name", "type")
-}
-
-case class BodyQuestion(uuid:String, name:String, typ:String=BodyQuestion.typ) extends Question
-object BodyQuestion {
-  val typ = "body_question"
-  implicit def BodyQuestionCodecJson: CodecJson[BodyQuestion] =
-    casecodec3(BodyQuestion.apply, BodyQuestion.unapply)("uuid", "name", "type")
-}
-case class SoundQuestion(uuid:String, name:String, typ:String=SoundQuestion.typ) extends Question
-object SoundQuestion {
-  val typ = "sound_question"
-  implicit def SoundQuestionCodecJson: CodecJson[SoundQuestion] =
-    casecodec3(SoundQuestion.apply, SoundQuestion.unapply)("uuid", "name", "type")
-}
-
-@argonaut case class JournalPage(uuid:String, title:String, subtitle:String, questions:List[Question])
-
-@argonaut case class Journal(uuid:String, createdAt:String, updatedAt:String, pages:List[JournalPage])
-
-@argonaut case class JournalEntry(journalUuid:String, createdAt:String, updatedAt:String, answers:Map[String, Map[String, String]])
-

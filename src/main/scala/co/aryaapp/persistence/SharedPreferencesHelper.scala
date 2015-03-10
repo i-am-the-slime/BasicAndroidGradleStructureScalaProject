@@ -1,14 +1,9 @@
 package co.aryaapp.persistence
 
-import android.content.Context
-import co.aryaapp.communication.Journal
-
 object SharedPreferencesHelper {
   val Name = "co.aryaapp.arya"
   val UnfinishedJournal = "unfinished_journal"
 }
-
-import SharedPreferencesHelper._
 
 trait SharedPreferencesHelper {
 //  private val DefaultString = "bollox"

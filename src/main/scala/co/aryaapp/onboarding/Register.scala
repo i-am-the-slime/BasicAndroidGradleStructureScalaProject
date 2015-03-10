@@ -5,16 +5,18 @@ import java.net.UnknownHostException
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.util.Log
-import android.view.{View, ViewGroup, LayoutInflater}
-import android.widget.{TextView, EditText}
-import co.aryaapp.communication._
+import android.view.{LayoutInflater, View, ViewGroup}
+import android.widget.{EditText, TextView}
+import argonaut.Argonaut._
+import co.aryaapp.TypedResource._
+import co.aryaapp._
+import co.aryaapp.communication.DataTypes._
+import co.aryaapp.communication.{RestClient, TokenGetter}
 import co.aryaapp.communication.TokenGetter.InvalidEmailOrPassword
 import co.aryaapp.helpers.AndroidConversions._
-import co.aryaapp._
-import TypedResource._
 import co.aryaapp.helpers.Animations
 
-import scala.util.{Try, Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class Register extends OnboardingFragment{
   lazy val email = getView.findView(TR.registerEmail)
@@ -64,10 +66,12 @@ class Register extends OnboardingFragment{
         Animations.cartoonDashAway(0, (_) => {
           createAccountButton.setVisibility(View.INVISIBLE)
           hideKeyboard(createAccountButton)
-          val userToCreate = PostUser( User(email.getText.toString, hashPassword(password.getText.toString)) )
-          val createdUser = Try( new RestClient(None).postToServer[PostUser, PostUserResult]("/users", userToCreate) )
+          val user =  NewUser(email.getText.toString, hashPassword(password.getText.toString))
+          val userToCreate = PostNewUser(user)
+          Log.e("Mother", s"User: ${userToCreate.asJson.nospaces}")
+          val createdUser = Try( new RestClient(None).postToServer[PostNewUser, PostUserResult]("/users", userToCreate) )
           createdUser match {
-            case Success(user) =>
+            case Success(_) =>
               TokenGetter.getToken(email.getText.toString, password.getText.toString).onComplete{
                 case Success(token) => activity.loginSuccessful(token)
                 case Failure(t) => loginFailed(t)

@@ -4,8 +4,9 @@ import java.net.URL
 
 import android.os.AsyncTask
 import android.util.Log
-import com.squareup.okhttp.{Request, RequestBody, OkHttpClient}
-import argonaut._, Argonaut._
+import argonaut.Argonaut._
+import argonaut._
+import com.squareup.okhttp.{OkHttpClient, Request, RequestBody}
 
 import scala.concurrent.{ExecutionContext, Future}
 

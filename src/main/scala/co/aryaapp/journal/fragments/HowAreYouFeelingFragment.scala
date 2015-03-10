@@ -1,26 +1,25 @@
 package co.aryaapp.journal.fragments
 
 import android.os.Bundle
-import android.view.{View, ViewGroup, LayoutInflater}
-import android.widget.{SeekBar, TextView}
-import co.aryaapp.communication.{SliderAnswer, Answer}
-import co.aryaapp.{TypedResource, R, TR}
+import android.view.{LayoutInflater, View, ViewGroup}
+import android.widget.SeekBar
+import co.aryaapp.TypedResource._
 import co.aryaapp.journal.JournalBaseFragment
-import co.aryaapp.helpers._
-import AndroidConversions._
-import TypedResource._
+import co.aryaapp.{R, TR}
+
+import scala.collection.immutable.IndexedSeq
 
 class HowAreYouFeelingFragment extends
   JournalBaseFragment(
     R.drawable.ic_heart,
     R.string.frag_how_are_you_feeling_title,
-    R.string.frag_how_are_you_feeling_subtitle) {
+    R.string.frag_how_are_you_feeling_subtitle) with SliderAnswer {
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
     inflater.inflate(R.layout.frag_journal_feeling, container, false)
   }
 
-  lazy val sliders = {
+  override lazy val sliders: IndexedSeq[SeekBar] = {
     val view = getView.findView(TR.slider_container)
     for {
       index <- 0 until view.getChildCount
@@ -28,19 +27,4 @@ class HowAreYouFeelingFragment extends
     } yield child.asInstanceOf[SeekBar]
   }
 
-  override def populateViewFromAnswer(answer: Answer): Unit = {
-    answer match {
-      case a:SliderAnswer =>
-        val valueAndView = a.values.values.toList.zip(sliders)
-        for(
-          (value, view ) <- valueAndView
-        )  view.setProgress(value)
-    }
-  }
-
-  override def getAnswerFromView(): Option[Answer] = {
-    //TODO convince Menno that questions are not necessary or get them from the view
-    val values = sliders.map(slider => ("question" ,slider.getProgress)).toMap[String, Int]
-    Some(SliderAnswer("ABCD", values))
-  }
 }

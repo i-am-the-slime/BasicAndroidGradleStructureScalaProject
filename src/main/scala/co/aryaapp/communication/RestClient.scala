@@ -2,11 +2,12 @@ package co.aryaapp.communication
 
 import android.os.AsyncTask
 import android.util.Log
-import com.squareup.okhttp.{Request, RequestBody, MediaType, OkHttpClient}
-import argonaut._, Argonaut._
-import scalaz._, Scalaz._
+import argonaut.Argonaut._
+import argonaut._
+import com.squareup.okhttp.{MediaType, OkHttpClient, Request, RequestBody}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scalaz._
 
 object RestClient{
   implicit val ec = ExecutionContext.fromExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
@@ -20,10 +21,10 @@ object RestClient{
 sealed abstract class APIServerError(code: Int, message:String)
 case class Unauthorized(msg:String) extends APIServerError(401, msg)
 case class BadRequest(msg:String) extends APIServerError(400, msg)
-case class UnknownError() extends APIServerError(-1, "Unknown error occurred")
+case class UnknownError(code:Int, msg:String) extends APIServerError(code, msg)
 
 class RestClient(val accessToken:Option[String]) {
-  import RestClient._
+  import co.aryaapp.communication.RestClient._
 
   protected def getRequest(resource:String) = request(resource, None)
 
@@ -41,11 +42,11 @@ class RestClient(val accessToken:Option[String]) {
 
   protected def getError(responseString:String):APIServerError = {
     val decodeResult = responseString.decode[Resp]
-    val error = decodeResult.getOrElse(Resp(Errors(-1, "Unknown Error"))).errors
+    val error = decodeResult.getOrElse(Resp(Errors(-1, "Could not decode the result."))).errors
     error.code match {
-      case 400 => BadRequest(error.message)
-      case 401 => Unauthorized(error.message)
-      case _ => UnknownError()
+      case 400 ⇒ BadRequest(error.message)
+      case 401 ⇒ Unauthorized(error.message)
+      case x   ⇒ UnknownError(x, error.message)
     }
   }
 

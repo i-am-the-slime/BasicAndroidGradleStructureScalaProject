@@ -6,8 +6,11 @@ import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import co.aryaapp.TypedResource._
+import co.aryaapp.communication.DataTypes.{Journal, JournalPage}
 import co.aryaapp.helpers.AndroidConversions._
 import co.aryaapp.helpers._
+import co.aryaapp.java.MaterialMenuDrawable
+import co.aryaapp.java.MaterialMenuDrawable.Stroke
 import co.aryaapp.journal.fragments._
 import co.aryaapp.{R, TR}
 
@@ -19,27 +22,57 @@ class JournalActivity extends AryaBaseActivity with SlideIn with SlideOut{
   lazy val fragmentContainer = this.findView(TR.fragment_container)
   lazy val closeButton = this.findView(TR.closeButton)
   lazy val nextButton = this.findView(TR.nextButton)
+  lazy val nextButtonDrawable = new MaterialMenuDrawable(this, getResources.getColor(R.color.white), Stroke.THIN)
   lazy val pixelsToMove = getScreenWidth - nextButtonDefaultX + nextButton.getWidth
+
   var nextButtonDefaultX = 0f
+
+  var answers = Map[Int, String]()
+
   lazy val pages = Array(
-    () ⇒  new HowAreYouFeelingFragment,
-    () ⇒  new WhatHappenedFragment,
-    () ⇒  new HowDidYouReactFragment,
-    () ⇒  new HowDidYourBodyReactFragment,
-    () ⇒  new WhatAreYouThinkingFragment
-    () ⇒ new DoneFragment) //TODO Add done fragment
-  def currentPosition = getSupportFragmentManager.getFragments.get(0).getTag.toInt
+    () ⇒ new HowAreYouFeelingFragment,
+    () ⇒ new WhatHappenedFragment,
+    () ⇒ new HowDidYouReactFragment,
+    () ⇒ new HowDidYourBodyReactFragment,
+    () ⇒ new WhatAreYouThinkingFragment,
+    () ⇒ new DoneFragment ) //TODO Add done fragment
+  def currentFragment:JournalBaseFragment = getSupportFragmentManager.getFragments.get(0).asInstanceOf[JournalBaseFragment]
+  def currentPosition = currentFragment.getTag.toInt
 
   override def onCreate(savedInstanceState: Bundle) = {
     super.onCreate(savedInstanceState)
     //Setup View Pager for the fragments and its adapter
     setContentView(R.layout.activity_journal)
-    nextButton.setOnClickListener((_:View) => goToNextPagerItem())
-    nextButtonDefaultX = nextButton.getX
-    closeButton.setOnClickListener((_: View) => finish())
+    closeButton.setOnClickListener((_: View) ⇒ finish())
+    setupNextButton()
     val baseFrag = pages(0)()
     getSupportFragmentManager.beginTransaction().add(containerId, baseFrag, "0").commit()
     ()
+  }
+
+  def setupNextButton() = {
+    nextButton setOnClickListener nextButtonListener
+    nextButton setBackground nextButtonDrawable
+    nextButtonDefaultX = nextButton getX
+  }
+  
+  val nextButtonListener = (nb:View) ⇒ {
+    saveCurrentAnswersToMap()
+    goToNextPagerItem()
+  }
+
+  def saveCurrentAnswersToMap() = {
+    val pos = currentPosition
+    val frag = currentFragment
+    for ((k, v) ← answers) Log.e("Mother", s"key: $k  value: $v")
+    pos match {
+      case last if last == (pages.size - 1) ⇒
+//        Journal("abcdefg", "now", "now", List(JournalPage("abcd", "title", "subtitle")))
+      case p if p < (pages.size - 1) ⇒
+        for (answer ← frag.getAnswerFromView) {
+          answers = answers.updated(pos, answer)
+        }
+    }
   }
 
   override def onBackPressed() = {
@@ -56,7 +89,7 @@ class JournalActivity extends AryaBaseActivity with SlideIn with SlideOut{
   }
 
   def titleForFragment(frag:JournalBaseFragment):String = {
-    getResources.getString(frag.title)
+    getResources getString frag.title
   }
 
   def setCurrentItemFromPosition(positionTransition:PositionTransition):Boolean = {
@@ -71,8 +104,14 @@ class JournalActivity extends AryaBaseActivity with SlideIn with SlideOut{
         transaction(after).some
       case _ ⇒ None
     }
-    for(ta ← transactionOpt) ta.commit()
-    transactionOpt.isDefined
+    for(ta ← transactionOpt) {
+      ta.commit()
+      if(positionTransition.after == pages.length-1)
+        nextButtonDrawable.animateIconState(MaterialMenuDrawable.IconState.CHECK, false)
+      else if(positionTransition.before == pages.length-1 && positionTransition.after == pages.length-2)
+        nextButtonDrawable.animateIconState(MaterialMenuDrawable.IconState.ARROW, false)
+    }
+    transactionOpt isDefined
   }
 
   def goToNextPagerItem():Boolean = {

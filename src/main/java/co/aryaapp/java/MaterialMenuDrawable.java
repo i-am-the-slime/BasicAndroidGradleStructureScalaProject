@@ -21,17 +21,16 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
+import android.graphics.*;
 import android.graphics.drawable.Animatable;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.util.Property;
 import android.util.TypedValue;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+import co.aryaapp.R;
 
 
 import static android.graphics.Paint.Style;
@@ -120,8 +119,9 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
     }
 
     public static final int DEFAULT_COLOR              = Color.WHITE;
-    public static final int DEFAULT_SCALE              = 1;
+    public static final float DEFAULT_SCALE            = 1.5f;
     public static final int DEFAULT_TRANSFORM_DURATION = 800;
+//    public static final int DEFAULT_TRANSFORM_DURATION = 3000;
     public static final int DEFAULT_PRESSED_DURATION   = 400;
 
     private static final int BASE_DRAWABLE_WIDTH  = 40;
@@ -130,13 +130,13 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
     private static final int BASE_CIRCLE_RADIUS   = 18;
 
     private static final float ARROW_MID_LINE_ANGLE = 180;
-    private static final float ARROW_TOP_LINE_ANGLE = 135;
-    private static final float ARROW_BOT_LINE_ANGLE = 225;
+    private static final float ARROW_TOP_LINE_ANGLE = 225;
+    private static final float ARROW_BOT_LINE_ANGLE = 135;
     private static final float X_TOP_LINE_ANGLE     = 44;
     private static final float X_BOT_LINE_ANGLE     = -44;
     private static final float X_ROTATION_ANGLE     = 90;
     private static final float CHECK_MIDDLE_ANGLE   = 135;
-    private static final float CHECK_BOTTOM_ANGLE   = -90;
+    private static final float CHECK_BOTTOM_ANGLE   = -180;
 
     private static final float TRANSFORMATION_START = 0;
     private static final float TRANSFORMATION_MID   = 1.0f;
@@ -167,18 +167,18 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
     private final Paint iconPaint   = new Paint();
     private final Paint bgCirclePaint = new Paint();
     private final Paint circlePaint = new Paint();
+    private final Paint shadowCirclePaint = new Paint();
 
     private float   transformationValue   = 0f;
     private float   pressedProgressValue  = 0f;
     private boolean transformationRunning = false;
 
-    private IconState      currentIconState = IconState.BURGER;
-    private AnimationState animationState   = AnimationState.BURGER_ARROW;
+    private IconState      currentIconState = IconState.ARROW;
+    private AnimationState animationState   = AnimationState.ARROW_CHECK;
 
     private IconState animatingIconState;
     private boolean   drawTouchCircle;
     private boolean   neverDrawTouch;
-    private boolean   rtlEnabled;
 
     private ObjectAnimator transformation;
     private ObjectAnimator pressedCircle;
@@ -193,7 +193,7 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
         this(context, color, stroke, DEFAULT_SCALE, transformDuration, pressedDuration);
     }
 
-    public MaterialMenuDrawable(Context context, int color, Stroke stroke, int scale, int transformDuration, int pressedDuration) {
+    public MaterialMenuDrawable(Context context, int color, Stroke stroke, float scale, int transformDuration, int pressedDuration) {
         Resources resources = context.getResources();
         // convert each separately due to various densities
         this.dip1 = dpToPx(resources, 1) * scale;
@@ -251,6 +251,10 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
         iconPaint.setStrokeWidth(strokeWidth);
         iconPaint.setColor(color);
 
+        shadowCirclePaint.setAntiAlias(true);
+        shadowCirclePaint.setStyle(Style.FILL);
+        shadowCirclePaint.setShader(new RadialGradient(width/2, width/2, width/2, Color.BLACK, 0xE51400, Shader.TileMode.CLAMP));
+
         circlePaint.setAntiAlias(true);
         circlePaint.setStyle(Style.FILL);
         circlePaint.setColor(color);
@@ -259,7 +263,6 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
         bgCirclePaint.setAntiAlias(true);
         bgCirclePaint.setStyle(Style.FILL);
         bgCirclePaint.setColor(0xFFFF0066);
-        bgCirclePaint.setAlpha(DEFAULT_CIRCLE_ALPHA);
 
         setBounds(0, 0, width, height);
     }
@@ -271,7 +274,8 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
     @Override public void draw(Canvas canvas) {
         final float ratio = transformationValue <= 1 ? transformationValue : 2 - transformationValue;
 
-        canvas.drawCircle(width / 2, height / 2, 50, bgCirclePaint);
+        canvas.drawCircle(width / 2 + dip4, height / 2 + dip4, width / 2, shadowCirclePaint);
+        canvas.drawCircle(width / 2, height / 2, width / 2, bgCirclePaint);
 
         drawTopLine(canvas, ratio);
         drawMiddleLine(canvas, ratio);
@@ -298,58 +302,17 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
         float stopY = topPadding + dip3 / 2 * 5;
         int alpha = 255;
 
-        switch (animationState) {
-            case BURGER_ARROW:
-                // rotate by 180
-                if (isMorphingForward()) {
-                    rotation = ratio * ARROW_MID_LINE_ANGLE;
-                } else {
-                    rotation = ARROW_MID_LINE_ANGLE + (1 - ratio) * ARROW_MID_LINE_ANGLE;
-                }
-                // shorten one end
-                stopX -= ratio * resolveStrokeModifier(ratio) / 2;
-                break;
-            case BURGER_X:
-                // fade out
-                alpha = (int) ((1 - ratio) * 255);
-                break;
-            case ARROW_X:
-                // fade out and shorten one end
-                alpha = (int) ((1 - ratio) * 255);
-                startX += (1 - ratio) * dip2;
-                break;
-            case ARROW_CHECK:
-                if (isMorphingForward()) {
-                    // rotate until required angle
-                    rotation = ratio * CHECK_MIDDLE_ANGLE;
-                } else {
-                    // rotate back to starting angle
-                    rotation = CHECK_MIDDLE_ANGLE - CHECK_MIDDLE_ANGLE * (1 - ratio);
-                }
-                // shorten one end and lengthen the other
-                startX += dip3 / 2 + dip4 - (1 - ratio) * dip2;
-                stopX += ratio * dip1;
-                pivotX = width / 2 + dip3 + diph;
-                break;
-            case BURGER_CHECK:
-                // rotate until required angle
-                rotation = ratio * CHECK_MIDDLE_ANGLE;
-                // lengthen both ends
-                startX += ratio * (dip4 + dip3 / 2);
-                stopX += ratio * dip1;
-                pivotX = width / 2 + dip3 + diph;
-                break;
-            case X_CHECK:
-                // fade in
-                alpha = (int) (ratio * 255);
-                // rotation to check angle
-                rotation = ratio * CHECK_MIDDLE_ANGLE;
-                // lengthen both ends
-                startX += ratio * (dip4 + dip3 / 2);
-                stopX += ratio * dip1;
-                pivotX = width / 2 + dip3 + diph;
-                break;
+        if (isMorphingForward()) {
+            // rotate until required angle
+            rotation = ratio * CHECK_MIDDLE_ANGLE;
+        } else {
+            // rotate back to starting angle
+            rotation = CHECK_MIDDLE_ANGLE - CHECK_MIDDLE_ANGLE * (1 - ratio);
         }
+        // shorten one end and lengthen the other
+        startX += dip3 / 2 + dip4 - (1 - ratio) * dip4;
+        stopX += ratio * dip1 - ((1 - ratio) * dip1);
+        pivotX = width / 2 + dip3 + diph;
 
         iconPaint.setAlpha(alpha);
         canvas.rotate(rotation, pivotX, pivotY);
@@ -367,83 +330,22 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
         float pivotY2 = topPadding + dip2;
 
         float startX = sidePadding;
-        float startY = topPadding + dip2;
-        float stopX = width - sidePadding;
-        float stopY = topPadding + dip2;
+        float stopX  = width - sidePadding;
+
+        float startY = topPadding + dip1;
+        float stopY = topPadding + dip1;
         int alpha = 255;
 
-        switch (animationState) {
-            case BURGER_ARROW:
-                if (isMorphingForward()) {
-                    // rotate until required angle
-                    rotation = ratio * ARROW_BOT_LINE_ANGLE;
-                } else {
-                    // rotate back to start doing a 360
-                    rotation = ARROW_BOT_LINE_ANGLE + (1 - ratio) * ARROW_TOP_LINE_ANGLE;
-                }
-                // rotate by middle
-                pivotX = width / 2;
-                pivotY = height / 2;
+        // fade out
+        alpha = (int) ((1 - ratio) * 255);
+        // retain starting arrow configuration
+        rotation = ARROW_BOT_LINE_ANGLE;
+        pivotX = width / 2;
+        pivotY = height / 2;
 
-                // shorten both ends
-                stopX -= resolveStrokeModifier(ratio);
-                startX += dip3 * ratio;
-
-                break;
-            case BURGER_X:
-                // rotate until required angles
-                rotation = X_TOP_LINE_ANGLE * ratio;
-                rotation2 = X_ROTATION_ANGLE * ratio;
-
-                // pivot at left corner of line
-                pivotX = sidePadding + dip4;
-                pivotY = topPadding + dip3;
-
-                // shorten one end
-                startX += dip3 * ratio;
-                break;
-            case ARROW_X:
-                // rotate from ARROW angle to X angle
-                rotation = ARROW_BOT_LINE_ANGLE + (X_TOP_LINE_ANGLE - ARROW_BOT_LINE_ANGLE) * ratio;
-                rotation2 = X_ROTATION_ANGLE * ratio;
-
-                // move pivot from ARROW pivot to X pivot
-                pivotX = width / 2 + (sidePadding + dip4 - width / 2) * ratio;
-                pivotY = height / 2 + (topPadding + dip3 - height / 2) * ratio;
-
-                // lengthen both ends
-                stopX -= resolveStrokeModifier(ratio);
-                startX += dip3;
-                break;
-            case ARROW_CHECK:
-                // fade out
-                alpha = (int) ((1 - ratio) * 255);
-                // retain starting arrow configuration
-                rotation = ARROW_BOT_LINE_ANGLE;
-                pivotX = width / 2;
-                pivotY = height / 2;
-
-                // shorted both ends
-                stopX -= resolveStrokeModifier(1);
-                startX += dip3;
-                break;
-            case BURGER_CHECK:
-                // fade out
-                alpha = (int) ((1 - ratio) * 255);
-                break;
-            case X_CHECK:
-                // retain X configuration
-                rotation = X_TOP_LINE_ANGLE;
-                rotation2 = X_ROTATION_ANGLE;
-                pivotX = sidePadding + dip4;
-                pivotY = topPadding + dip3;
-                stopX += dip3 - dip3 * (1 - ratio);
-                startX += dip3;
-
-                // fade out
-                alpha = (int) ((1 - ratio) * 255);
-                break;
-        }
+        // shorted both ends
+        stopX -= resolveStrokeModifier(1);
+        startX += dip3;
 
         iconPaint.setAlpha(alpha);
         canvas.rotate(rotation, pivotX, pivotY);
@@ -463,96 +365,20 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
         float pivotY2 = height - topPadding - dip2;
 
         float startX = sidePadding;
-        float startY = height - topPadding - dip2;
+        float startY = height - topPadding - dip1;
         float stopX = width - sidePadding;
-        float stopY = height - topPadding - dip2;
+        float stopY = height - topPadding - dip1;
 
-        switch (animationState) {
-            case BURGER_ARROW:
-                if (isMorphingForward()) {
-                    // rotate to required angle
-                    rotation = ARROW_TOP_LINE_ANGLE * ratio;
-                } else {
-                    // rotate back to start doing a 360
-                    rotation = ARROW_TOP_LINE_ANGLE + (1 - ratio) * ARROW_BOT_LINE_ANGLE;
-                }
-                // pivot center of canvas
-                pivotX = width / 2;
-                pivotY = height / 2;
+        // rotate from ARROW angle to CHECK angle
+        rotation = ARROW_TOP_LINE_ANGLE + ratio * CHECK_BOTTOM_ANGLE;
 
-                // shorten both ends
-                stopX = width - sidePadding - resolveStrokeModifier(ratio);
-                startX = sidePadding + dip3 * ratio;
-                break;
-            case BURGER_X:
-                if (isMorphingForward()) {
-                    // rotate around
-                    rotation2 = -X_ROTATION_ANGLE * ratio;
-                } else {
-                    // rotate directly
-                    rotation2 = X_ROTATION_ANGLE * ratio;
-                }
-                // rotate to required angle
-                rotation = X_BOT_LINE_ANGLE * ratio;
+        // move pivot from ARROW pivot to CHECK pivot
+        pivotX = width / 2 + dip3 * ratio;
+        pivotY = height / 2 - dip3 * ratio;
 
-                // pivot left corner of line
-                pivotX = sidePadding + dip4;
-                pivotY = height - topPadding - dip3;
-
-                // shorten one end
-                startX += dip3 * ratio;
-                break;
-            case ARROW_X:
-                // rotate from ARROW angle to X angle
-                rotation = ARROW_TOP_LINE_ANGLE + (360 + X_BOT_LINE_ANGLE - ARROW_TOP_LINE_ANGLE) * ratio;
-                rotation2 = -X_ROTATION_ANGLE * ratio;
-
-                // move pivot from ARROW pivot to X pivot
-                pivotX = width / 2 + (sidePadding + dip4 - width / 2) * ratio;
-                pivotY = height / 2 + (height / 2 - topPadding - dip3) * ratio;
-
-                // lengthen both ends
-                stopX -= resolveStrokeModifier(ratio);
-                startX += dip3;
-                break;
-            case ARROW_CHECK:
-                // rotate from ARROW angle to CHECK angle
-                rotation = ARROW_TOP_LINE_ANGLE + ratio * CHECK_BOTTOM_ANGLE;
-
-                // move pivot from ARROW pivot to CHECK pivot
-                pivotX = width / 2 + dip3 * ratio;
-                pivotY = height / 2 - dip3 * ratio;
-
-                // length stays same as ARROW
-                stopX -= resolveStrokeModifier(1);
-                startX += dip3 + (dip4 + dip1) * ratio;
-                break;
-            case BURGER_CHECK:
-                // rotate from ARROW angle to CHECK angle
-                rotation = ratio * (CHECK_BOTTOM_ANGLE + ARROW_TOP_LINE_ANGLE);
-
-                // move pivot from BURGER pivot to CHECK pivot
-                pivotX = width / 2 + dip3 * ratio;
-                pivotY = height / 2 - dip3 * ratio;
-
-                // length stays same as BURGER
-                startX += dip8 * ratio;
-                stopX -= resolveStrokeModifier(ratio);
-                break;
-            case X_CHECK:
-                // rotate from X to CHECK angles
-                rotation2 = -X_ROTATION_ANGLE * (1 - ratio);
-                rotation = X_BOT_LINE_ANGLE + (CHECK_BOTTOM_ANGLE + ARROW_TOP_LINE_ANGLE - X_BOT_LINE_ANGLE) * ratio;
-
-                // move pivot from X to CHECK
-                pivotX = sidePadding + dip4 + (width / 2 + dip3 - sidePadding - dip4) * ratio;
-                pivotY = height - topPadding - dip3 + (topPadding + height / 2 - height) * ratio;
-
-                // shorten both ends
-                startX += dip8 - (dip4 + dip1) * (1 - ratio);
-                stopX -= resolveStrokeModifier(1 - ratio);
-                break;
-        }
+        // length stays same as ARROW
+        stopX -= resolveStrokeModifier(1);
+        startX += dip3 + (dip4 + dip1) * ratio;
 
         canvas.rotate(rotation, pivotX, pivotY);
         canvas.rotate(rotation2, pivotX2, pivotY2);
@@ -632,20 +458,20 @@ public class MaterialMenuDrawable extends Drawable implements Animatable {
             if (currentIconState == iconState) return;
 
             switch (iconState) {
-                case BURGER:
-                    animationState = AnimationState.BURGER_ARROW;
-                    transformationValue = TRANSFORMATION_START;
-                    break;
+//                case BURGER:
+//                    animationState = AnimationState.BURGER_ARROW;
+//                    transformationValue = TRANSFORMATION_START;
+//                    break;
                 case ARROW:
-                    animationState = AnimationState.BURGER_ARROW;
-                    transformationValue = TRANSFORMATION_MID;
+                    animationState = AnimationState.ARROW_CHECK;
+                    transformationValue = TRANSFORMATION_END;
                     break;
-                case X:
-                    animationState = AnimationState.BURGER_X;
-                    transformationValue = TRANSFORMATION_MID;
-                    break;
+//                case X:
+//                    animationState = AnimationState.BURGER_X;
+//                    transformationValue = TRANSFORMATION_MID;
+//                    break;
                 case CHECK:
-                    animationState = AnimationState.BURGER_CHECK;
+                    animationState = AnimationState.ARROW_CHECK;
                     transformationValue = TRANSFORMATION_MID;
             }
             currentIconState = iconState;

@@ -1,7 +1,6 @@
 package co.aryaapp.onboarding
 
 import android.content.Intent
-import android.os.Bundle
 
 object TokenIntent {
   val key = "token"

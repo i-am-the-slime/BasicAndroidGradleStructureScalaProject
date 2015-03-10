@@ -1,30 +1,26 @@
 package co.aryaapp.helpers
 
+import java.lang.Thread.UncaughtExceptionHandler
 import java.util.TimerTask
 
-import android.app._
-
-import android.content._
-import android.content.res.Configuration
-import android.hardware.input.InputManager
-import android.media.MediaPlayer.OnCompletionListener
-import android.os.{IBinder, Build, Handler, Looper}
-import android.view.View
-import android.view.KeyEvent
-import android.view.MotionEvent
-import android.view.View.{OnClickListener, OnFocusChangeListener}
-import android.widget._
-import android.view.LayoutInflater
-import android.text.{SpannableString, SpannableStringBuilder, Spanned}
-import android.text.style.{StyleSpan, ForegroundColorSpan}
-import android.graphics.Typeface
-import scala.annotation.tailrec
-import android.util.Log
-import android.view.inputmethod.InputMethodManager
-import android.net.wifi.WifiManager
 import android.accounts.AccountManager
+import android.app._
+import android.content._
+import android.graphics.Typeface
+import android.media.MediaPlayer.OnCompletionListener
+import android.media.{AudioManager, MediaPlayer}
 import android.net.nsd.NsdManager
-import android.media.{MediaPlayer, AudioManager}
+import android.net.wifi.WifiManager
+import android.os.{Build, Handler, Looper}
+import android.text.style.{ForegroundColorSpan, StyleSpan}
+import android.text.{SpannableString, SpannableStringBuilder, Spanned}
+import android.util.Log
+import android.view.View.{OnClickListener, OnFocusChangeListener}
+import android.view.inputmethod.InputMethodManager
+import android.view.{KeyEvent, LayoutInflater, MotionEvent, View}
+import android.widget._
+
+import scala.annotation.tailrec
 import scala.language.implicitConversions
 
 object AndroidConversions {
@@ -37,81 +33,75 @@ object AndroidConversions {
   val kitkatAndNewer =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
 
-  implicit def toBroadcastReceiver[A](f: (Context, Intent) => A) =
+  implicit def toBroadcastReceiver[A](f: (Context, Intent) => A):BroadcastReceiver =
     new BroadcastReceiver() {
-      def onReceive(c: Context, i: Intent) = f(c, i)
+      def onReceive(c: Context, i: Intent) = { f(c,i); ()}
     }
 
-  implicit def toOnNavigationListener(f: (Int, Long) => Boolean) =
-    new ActionBar.OnNavigationListener() {
-      override def onNavigationItemSelected(pos: Int, id: Long) = f(pos, id)
-    }
+  implicit def toViewOnClickListener1[A](f: () => A):View.OnClickListener =
+    new View.OnClickListener() { def onClick(v: View) = { f(); ()} }
 
-  implicit def toViewOnClickListener1[A](f: () => A) =
-    new View.OnClickListener() { def onClick(v: View) = f() }
+  implicit def toViewOnClickListener[A](f: View => A):View.OnClickListener =
+    new View.OnClickListener() { def onClick(v: View) = { f(v); ()} }
 
-  implicit def toViewOnClickListener[A](f: View => A) =
-    new View.OnClickListener() { def onClick(v: View) = f(v) }
-
-  implicit def toCButtonOnCheckedChangedListener[A](f: Boolean => A) =
+  implicit def toCButtonOnCheckedChangedListener[A](f: Boolean => A):CompoundButton.OnCheckedChangeListener =
     new CompoundButton.OnCheckedChangeListener {
-      def onCheckedChanged(p1: CompoundButton, p2: Boolean) = f(p2)
+      def onCheckedChanged(p1: CompoundButton, p2: Boolean) = { f(p2); ()}
     }
 
-  implicit def toRGOnCheckedChangedListener[A](f: Int => A) =
+  implicit def toRGOnCheckedChangedListener[A](f: Int => A):RadioGroup.OnCheckedChangeListener =
     new RadioGroup.OnCheckedChangeListener {
-      def onCheckedChanged(p1: RadioGroup, id: Int) = f(id)
+      def onCheckedChanged(p1: RadioGroup, id: Int) = { f(id); ()}
     }
 
-  implicit def toDialogInterfaceOnClickListener[A](
-                                                    f: (DialogInterface, Int) => A) =
+  implicit def toDialogInterfaceOnClickListener[A](f: (DialogInterface, Int) => A):DialogInterface.OnClickListener =
     new DialogInterface.OnClickListener() {
-      def onClick(d: DialogInterface, id: Int) = f(d, id)
+      def onClick(d: DialogInterface, id: Int) = { f(d,id); ()}
     }
 
-  implicit def toDIOnCancelListener[A](f: () => A) =
+  implicit def toDIOnCancelListener[A](f: () => A):DialogInterface.OnCancelListener =
     new DialogInterface.OnCancelListener() {
-      def onCancel(p1: DialogInterface) = f()
+      def onCancel(p1: DialogInterface) = { f(); ()}
     }
 
-  implicit def toDIOnDismissListener[A](f: () => A) =
+  implicit def toDIOnDismissListener[A](f: () => A):DialogInterface.OnDismissListener =
     new DialogInterface.OnDismissListener() {
-      def onDismiss(p1: DialogInterface) = f()
+      def onDismiss(p1: DialogInterface) = { f(); ()}
     }
 
-  implicit def toDialogInterfaceOnClickListener1[A](f: () => A) =
+  implicit def toDialogInterfaceOnClickListener1[A](f: () => A):DialogInterface.OnClickListener =
     new DialogInterface.OnClickListener() {
-      def onClick(d: DialogInterface, id: Int) = f()
+      def onClick(d: DialogInterface, id: Int) = { f(); ()}
     }
 
-  implicit def toDialogInterfaceOnShowListener[A](f: () => A) =
+  implicit def toDialogInterfaceOnShowListener[A](f: () => A):DialogInterface.OnShowListener =
     new DialogInterface.OnShowListener() {
-      def onShow(d: DialogInterface) = f()
+      def onShow(d: DialogInterface) = { f(); ()}
     }
 
-  implicit def toAdapterViewOnItemClickListener[A](f: Int => A) =
+  implicit def toAdapterViewOnItemClickListener[A](f: Int => A):AdapterView.OnItemClickListener =
     new AdapterView.OnItemClickListener() {
-      def onItemClick(av: AdapterView[_], v: View, pos: Int, id: Long) = f(pos)
+      def onItemClick(av: AdapterView[_], v: View, pos: Int, id: Long) = { f(pos); ()}
     }
 
-  implicit def toViewOnKeyListener(f: (View, Int, KeyEvent) => Boolean) =
+  implicit def toViewOnKeyListener(f: (View, Int, KeyEvent) => Boolean):View.OnKeyListener =
     new View.OnKeyListener() {
       def onKey(v: View, key: Int, e: KeyEvent) = f(v, key, e)
     }
 
-  implicit def toViewOnTouchListener(f: (View, MotionEvent) => Boolean) =
+  implicit def toViewOnTouchListener(f: (View, MotionEvent) => Boolean):View.OnTouchListener =
     new View.OnTouchListener() {
       def onTouch(v: View, e: MotionEvent) = f(v, e)
     }
 
-  implicit def toTextViewOnEditorAction(f: (View, Int, KeyEvent) => Boolean) =
+  implicit def toTextViewOnEditorAction(f: (View, Int, KeyEvent) => Boolean):TextView.OnEditorActionListener =
     new TextView.OnEditorActionListener() {
       def onEditorAction(v: TextView, action: Int, e: KeyEvent) =
         f(v, action, e)
     }
 
-  implicit def toIntentFilter(s: String) = new IntentFilter(s)
-  implicit def toIntentFilter(ss: Seq[String]) = {
+  implicit def toIntentFilter(s: String):IntentFilter = new IntentFilter(s)
+  implicit def toIntentFilter(ss: Seq[String]):IntentFilter = {
     val filter = new IntentFilter
     ss foreach filter.addAction
     filter
@@ -125,24 +115,26 @@ object AndroidConversions {
 //      override def failure(p1: RetrofitError): Unit = f
 //    }
 
-  def hideKeyboard(fromView:View)(implicit ctx:Context) =
+  def hideKeyboard(fromView:View)(implicit ctx:Context):Unit = {
     ctx.getSystemService(Context.INPUT_METHOD_SERVICE)
       .asInstanceOf[InputMethodManager]
       .hideSoftInputFromWindow(fromView.getWindowToken, 0)
+    ()
+  }
 
-  implicit def toFocusChangedListener(f:(View, Boolean) => Unit): OnFocusChangeListener with Object {def onFocusChange(v: View, hasFocus: Boolean): Unit} = new OnFocusChangeListener {
+  implicit def toFocusChangedListener(f:(View, Boolean) => Unit): OnFocusChangeListener = new OnFocusChangeListener {
       override def onFocusChange(v: View, hasFocus: Boolean): Unit = f(v, hasFocus)
   }
 
-  implicit def toOnCompletionListener[A](f: (MediaPlayer) => A): OnCompletionListener with Object {def onCompletion(mp: MediaPlayer): Unit} =
-    new OnCompletionListener { override def onCompletion(mp: MediaPlayer): Unit = f(mp) }
+  implicit def toOnCompletionListener[A](f: (MediaPlayer) => A): OnCompletionListener =
+    new OnCompletionListener { override def onCompletion(mp: MediaPlayer): Unit = { f(mp); () } }
 
-  def toTimerTask[A](f: () => A): TimerTask {def run(): Unit} = new TimerTask() { override def run() = f() }
+  def toTimerTask[A](f: () => A): TimerTask {def run(): Unit} = new TimerTask() { override def run() = { f(); ()} }
   /* End Mark's stuff */
 
-  implicit def toRunnable[A](f: () => A): Runnable with Object {def run(): Unit} = new Runnable() { override def run() = f() }
+  implicit def toRunnable[A](f: () => A): Runnable = new Runnable() { override def run() = { f(); ()} }
 
-  implicit def toOnClickListener(f: View => Unit): OnClickListener with Object {def onClick(v: View): Unit} = new OnClickListener {
+  implicit def toOnClickListener(f: View => Unit): OnClickListener = new OnClickListener {
     override def onClick(v: View): Unit = f(v)
   }
 
@@ -151,34 +143,34 @@ object AndroidConversions {
   // ok, param: => T can only be used if called directly, no implicits
   def async[A](f: => A): Unit = async(byNameToRunnable(f))
 
-  def byNameToRunnable[A](f: => A) = new Runnable() { def run() = f }
+  def byNameToRunnable[A](f: => A) = new Runnable() { def run() = { f; () } }
 
-  implicit def toUncaughtExceptionHandler[A](f: (Thread, Throwable) => A) =
+  implicit def toUncaughtExceptionHandler[A](f: (Thread, Throwable) => A): UncaughtExceptionHandler =
     new Thread.UncaughtExceptionHandler {
-      override def uncaughtException(t: Thread, e: Throwable) = f(t, e)
+      override def uncaughtException(t: Thread, e: Throwable) = { f(t, e); () }
     }
 
-  implicit def toString(c: CharSequence) = if (c == null) null else c.toString
+  implicit def toString(c: CharSequence): String = if (c == null) null else c.toString
 
   implicit def toString(t: TextView): String = t.getText
 
-  implicit def toInt(t: TextView) = {
+  implicit def toInt(t: TextView): Int = {
     val s: String = t.getText
     if (s == null || s == "") -1 else Integer.parseInt(s)
   }
 
-  implicit def toBoolean(c: CheckBox) = c.isChecked
-  implicit def toRichRunnable(r: Runnable) = RichRunnable(r)
+  implicit def toBoolean(c: CheckBox): Boolean = c.isChecked
+  implicit def toRichRunnable(r: Runnable): RichRunnable = RichRunnable(r)
 
-  implicit def toRichProgressDialog(d: ProgressDialog) = RichProgressDialog(d)
-  implicit def toRichView(v: View) = RichView(v)
-  implicit def toRichCompoundButton(v: CompoundButton) = new RichCompoundButton(v)
-  implicit def toRichRadioGroup(v: RadioGroup) = new RichRadioGroup(v)
-  implicit def toRichListView(v: ListView) = RichListView(v)
-  implicit def toRichContext(c: Context) = RichContext(c)
-  implicit def toRichActivity(a: Activity) = new RichActivity(a)
-  implicit def toRichHandler(h: Handler) = RichHandler(h)
-  implicit def toSpannedGenerator(s: String) = SpannedGenerator(s)
+  implicit def toRichProgressDialog(d: ProgressDialog): RichProgressDialog = RichProgressDialog(d)
+  implicit def toRichView(v: View): RichView = RichView(v)
+  implicit def toRichCompoundButton(v: CompoundButton): RichCompoundButton = new RichCompoundButton(v)
+  implicit def toRichRadioGroup(v: RadioGroup): RichRadioGroup = new RichRadioGroup(v)
+  implicit def toRichListView(v: ListView): RichListView = RichListView(v)
+  implicit def toRichContext(c: Context): RichContext = RichContext(c)
+  implicit def toRichActivity(a: Activity): RichActivity = new RichActivity(a)
+  implicit def toRichHandler(h: Handler): RichHandler = RichHandler(h)
+  implicit def toSpannedGenerator(s: String): SpannedGenerator = SpannedGenerator(s)
 
   lazy val _threadpool = {
     if (honeycombAndNewer) android.os.AsyncTask.THREAD_POOL_EXECUTOR
@@ -201,7 +193,7 @@ object AndroidConversions {
 
 case class SystemService[T](name: String)
 object SystemService {
-  import Context._
+  import android.content.Context._
   implicit val ls = SystemService[LayoutInflater](LAYOUT_INFLATER_SERVICE)
   implicit val ns = SystemService[NotificationManager](NOTIFICATION_SERVICE)
   implicit val cm = SystemService[ClipboardManager](CLIPBOARD_SERVICE)
@@ -222,7 +214,7 @@ case class RichContext(context: Context) {
     context.getSystemService(s.name).asInstanceOf[T]
 }
 case class RichView(view: View) {
-  import AndroidConversions._
+  import co.aryaapp.helpers.AndroidConversions._
 
   def findViewById(id: Int): View = view.findViewById(id)
 
@@ -233,7 +225,7 @@ case class RichView(view: View) {
   def onClick[A](f: View => A) = view.setOnClickListener(f)
 }
 case class RichProgressDialog(d: ProgressDialog) {
-  import AndroidConversions._
+  import co.aryaapp.helpers.AndroidConversions._
 
   def onCancel[A](f: => A) = d.setOnCancelListener { () => f }
   def onClick[A](f: () => A) = d.setOnCancelListener(f)
@@ -241,17 +233,17 @@ case class RichProgressDialog(d: ProgressDialog) {
 
 class RichCompoundButton(override val view: CompoundButton)
   extends RichView(view) {
-  import AndroidConversions._
+  import co.aryaapp.helpers.AndroidConversions._
   def onCheckedChanged[A](f: Boolean => A) = view.setOnCheckedChangeListener(f)
 }
 class RichRadioGroup(override val view: RadioGroup)
   extends RichView(view) {
-  import AndroidConversions._
+  import co.aryaapp.helpers.AndroidConversions._
   def onCheckedChanged[A](f: Int => A) = view.setOnCheckedChangeListener(f)
 }
 
 case class RichListView(view: ListView) {
-  import AndroidConversions._
+  import co.aryaapp.helpers.AndroidConversions._
 
   def findViewById(id: Int): View = view.findViewById(id)
 
@@ -262,7 +254,7 @@ case class RichListView(view: ListView) {
 }
 // can't be case class because of inheritance :-/
 class RichActivity(activity: Activity) extends RichContext(activity) {
-  import Configuration._
+  import android.content.res.Configuration._
   lazy val config = activity.getResources.getConfiguration
 
   def findView[A <: View](id: Int): A =
@@ -309,17 +301,16 @@ case class SpannedGenerator(fmt: String) {
 
   @tailrec
   private def formatNext(s: SpannableStringBuilder, fmt: String,
-                         cur: Int, next: Int, items: Seq[CharSequence]) {
+                         cur: Int, next: Int, items: Seq[CharSequence]):Unit = {
     if (next == -1) {
       s.append(fmt.substring(cur, fmt.length))
+      ()
     } else {
       s.append(fmt.substring(cur, next))
       val space = fmt.indexWhere(!SpannedGenerator.DIGITS(_), next + 1)
-      val number = fmt.substring(next + 1,
-        if (space < 0) fmt.length else space).toInt
+      val number = fmt.substring(next + 1, if (space < 0) fmt.length else space).toInt
       s.append(Option(items(number - 1)) getOrElse "")
-      if (space > 0)
-        formatNext(s, fmt, space, fmt indexOf ("%", space), items)
+      if (space > 0) formatNext(s, fmt, space, fmt indexOf("%", space), items)
     }
   }
 

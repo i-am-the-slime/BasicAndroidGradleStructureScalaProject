@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import co.aryaapp.TypedResource._
 import co.aryaapp.helpers.AndroidConversions._
-import co.aryaapp.helpers.{SlideIn, AryaBaseActivity}
+import co.aryaapp.helpers.{AryaBaseActivity, SlideIn}
 import co.aryaapp.journal.JournalActivity
 import co.aryaapp.view.ImageSlidingTabLayout
 import co.aryaapp.{R, TR}
@@ -51,6 +51,8 @@ class AryaMain extends AryaBaseActivity with SlideIn{
     setContentView(R.layout.activity_main)
     setupViewPager()
     setupTabs()
+    startNewJournalActivity() //TODO Remove this in production
+    ()
   }
 
 

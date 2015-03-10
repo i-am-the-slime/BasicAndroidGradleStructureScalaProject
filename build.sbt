@@ -16,7 +16,9 @@ mergeManifests in Android := false
 proguardCache in Android ++= Seq(
     ProguardCache("argonaut") % "io.argonaut" %% "argonaut"
   , ProguardCache("scalaz") % "scalaz" %% "scalaz"
+  , ProguardCache("scalstm") % "org.scala-stm"
   , ProguardCache("slick") % "com.typesafe.slick"
+  , ProguardCache("android-support") % "support-v4"
   , ProguardCache("material-dialogs") % "com.allofestad" % "material-design"
 )
 
@@ -65,7 +67,7 @@ libraryDependencies ++= Seq(
 //Basics
 libraryDependencies ++= Seq(
   "uk.co.chrisjenx" % "calligraphy" % "1.2.1-SNAPSHOT"
-  , "com.nineoldandroids" % "library" % "2.4.0"
+//  , "com.nineoldandroids" % "library" % "2.4.0"
   , "joda-time" % "joda-time" % "2.4"
   , "org.joda" % "joda-convert" % "1.6"
   , "com.squareup.okhttp" % "okhttp-urlconnection" % "2.0.0"
@@ -93,9 +95,21 @@ libraryDependencies ++= Seq(
 )
 
 scalacOptions in (Compile, compile) ++= Seq(
+  "-deprecation",
+  "-encoding", "UTF-8",       // yes, this is 2 args
   "-feature",
+  "-language:existentials",
+  "-language:higherKinds",
   "-language:implicitConversions",
-  "-language:postfixOps"
+  "-unchecked",
+  "-Xfatal-warnings",
+  "-Xlint",
+  "-Yno-adapted-args",
+  "-Ywarn-dead-code",        // N.B. doesn't work well with the ??? hole
+  "-Ywarn-numeric-widen",
+  "-Ywarn-value-discard",
+  "-Xfuture"
+  //, "-Ywarn-unused-import"
 )
 
 apkbuildExcludes in Android ++= Seq(
@@ -112,7 +126,7 @@ run <<= run in Android
 
 install <<= install in Android
 
-val java7Home = Some(file("/Library/Java/JavaVirtualMachines/jdk1.7.0_71.jdk/Contents/Home"))
+val java7Home = Some(file("/Library/Java/JavaVirtualMachines/jdk1.7.0_71.jdk/Contents/Home/"))
 
 javaHome in (Compile, compile) := java7Home
 

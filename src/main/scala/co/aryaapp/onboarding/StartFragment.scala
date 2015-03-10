@@ -1,12 +1,10 @@
 package co.aryaapp.onboarding
 
-import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.view.{View, ViewGroup, LayoutInflater}
-import co.aryaapp.{TypedResource, TR, R}
+import android.view.{LayoutInflater, View, ViewGroup}
+import co.aryaapp.TypedResource._
 import co.aryaapp.helpers.AndroidConversions._
-import TypedResource._
+import co.aryaapp.{R, TR}
 
 class StartFragment extends OnboardingFragment{
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {

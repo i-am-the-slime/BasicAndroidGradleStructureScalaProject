@@ -3,18 +3,16 @@ package co.aryaapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import argonaut._, Argonaut._
-import co.aryaapp.communication._
+import co.aryaapp.communication.DataTypes._
+import co.aryaapp.communication.RestClient
 import co.aryaapp.helpers.AryaBaseActivity
 import co.aryaapp.main.AryaMain
 import co.aryaapp.onboarding.{OnboardingActivity, TokenIntent}
 import co.aryaapp.user.AryaUserCredentials
-import scala.collection.mutable.{Map => MMap}
 
-import scala.concurrent.Future
+import scala.collection.mutable.{Map => MMap}
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
-import scala.collection.JavaConversions._
 
 class AryaIntro extends AryaBaseActivity {
   import co.aryaapp.AryaIntro._
@@ -53,16 +51,16 @@ class AryaIntro extends AryaBaseActivity {
       )
 
       val client = new RestClient(Some(token))
-      val postResult = client.postToServer[Note, PostNoteResult]("/user/notes", Note("My best note, yeah?"))
-      postResult.onComplete{
-        case Success(s) =>
-          Log.e("MOTHER", s"Post result is $s")
-          val result= client.getFromServer[GetNotes]("/user/notes")
+//      val postResult = client.postToServer[User, PostUserResult]("/user", Note("My best note, yeah?"))
+//      postResult.onComplete{
+//        case Success(s) =>
+//          Log.e("MOTHER", s"Post result is $s")
+          val result = client.getFromServer[GetJournals]("/user/journals")
           result.onComplete{
             case Success(su) => Log.e("MOTHER", s"Get result is $su")
             case Failure(f) => Log.e("MOTHER", "Error is " + f.getMessage)
-          }
-        case Failure(f) => Log.e("MOTHER", "Error is " + f.getMessage)
+//          }
+//        case Failure(f) => Log.e("MOTHER", "Error is " + f.getMessage)
       }
 //      JournalIO.saveJournalEntries(journalEntries)
 //      Log.e("MOTHER", "Journal Entries:" + JournalIO.getJournalEntries.toString())

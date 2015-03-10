@@ -18,4 +18,11 @@
         <item name="android:layout_height">1px</item>
         <item name="android:background">@android:color/darker_gray</item>
     </style>
+    <declare-styleable name="MaterialMenuView">
+      <attr name="mm_color" format="color"/>
+      <attr name="mm_scale" format="integer"/>
+      <attr name="mm_transformDuration" format="integer"/>
+      <attr name="mm_pressedDuration" format="integer"/>
+      <attr name="mm_strokeWidth" format="integer"/>
+    </declare-styleable>
 </resources>

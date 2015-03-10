@@ -1,33 +1,29 @@
 package co.aryaapp.journal.fragments
 
 import android.graphics._
-import android.graphics.drawable.{TransitionDrawable, BitmapDrawable}
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutCompat
 import android.util.Log
 import android.view.View.OnTouchListener
-import android.view.{MotionEvent, View, ViewGroup, LayoutInflater}
+import android.view.{LayoutInflater, MotionEvent, View, ViewGroup}
 import android.widget.{CheckBox, ImageView}
-import co.aryaapp.communication.{BodyAnswer, Answer}
-import co.aryaapp.{TR, TypedResource, R}
-import co.aryaapp.helpers.AndroidConversions
+import co.aryaapp.TypedResource._
 import co.aryaapp.journal.JournalBaseFragment
-import AndroidConversions._
-import TypedResource._
+import co.aryaapp.journal.fragments.BodyModel._
+import co.aryaapp.{R, TR}
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.MaterialDialog.{SimpleCallback, Callback}
+import com.afollestad.materialdialogs.MaterialDialog.SimpleCallback
 
 import scala.collection.concurrent.TrieMap
 import scala.util.Try
-import scalaz.{Isomorphism, IsomorphismsLow0}
-import BodyModel._
 
 class HowDidYourBodyReactFragment extends
       JournalBaseFragment(
         R.drawable.ic_body,
         R.string.frag_how_did_your_body_react_title,
         R.string.frag_how_did_your_body_react_subtitle
-      ){
+      ) with BodyAnswer {
 
   def getTouchImage(v:View) = v.findView(TR.touch_image)
 
@@ -60,7 +56,7 @@ class HowDidYourBodyReactFragment extends
     }
   }
 
-  val selectedBodyParts:TrieMap[BodyPart, Seq[CharSequence]] = TrieMap()
+  override val answers:TrieMap[String, List[String]] = TrieMap()
 
   def showDialogue(bodyPart:BodyPart) = {
     val choices: Array[String] = bodyPart match {
@@ -88,7 +84,7 @@ class HowDidYourBodyReactFragment extends
       val checkboxes = for {
         choice <- choices
         cb = new CheckBox(getActivity)
-        _ = cb.setChecked(selectedBodyParts.getOrElse(bodyPart, Nil).contains(choice))
+        _ = cb.setChecked(answers.getOrElse(bodyPartToName(bodyPart), Nil).contains(choice))
         _ = cb.setTextColor(getResources.getColor(R.color.black))
         _ = cb.setText(choice)
       } yield cb
@@ -106,20 +102,20 @@ class HowDidYourBodyReactFragment extends
           override def onPositive(materialDialog: MaterialDialog): Unit = {
             val texts = for {
               cb <- checkboxes if cb.isChecked
-            } yield cb.getText
-            processChoice(bodyPart, texts)
+            } yield cb.getText.toString
+            processChoice(bodyPart, texts.toList)
           }
         })
         .customView(view)
         .show()
     }
 
-    def processChoice(bodyPart: BodyPart, texts: Seq[CharSequence]) = {
-      selectedBodyParts.get(bodyPart) match {
+    def processChoice(bodyPart: BodyPart, texts: List[String]) = {
+      answers.get(bodyPartToName(bodyPart)) match {
         case Some(issues) =>
-          selectedBodyParts.update(bodyPart, texts)
+          answers.update(bodyPartToName(bodyPart), texts)
         case None =>
-          selectedBodyParts.put(bodyPart, texts)
+          answers.put(bodyPartToName(bodyPart), texts)
       }
       drawAllParts()
     }
@@ -161,8 +157,8 @@ class HowDidYourBodyReactFragment extends
     val base = BitmapFactory.decodeResource(getResources, R.drawable.body, options)
     touchImageView.setImageBitmap(base)
     for {
-      (bodyPart, text) <- selectedBodyParts if text.nonEmpty
-    } replaceCurrentBitmap(bodyPart)
+      (bodyPart, text) <- answers if text.nonEmpty
+    } replaceCurrentBitmap(nameToBodyPart(bodyPart))
     touchImageView.invalidate()
   }
 
@@ -179,25 +175,5 @@ class HowDidYourBodyReactFragment extends
     canvas.drawBitmap(destination, 0f, 0f, null)
     destination.recycle()
     bmp
-  }
-
-  override def populateViewFromAnswer(answer: Answer): Unit = answer match {
-    case BodyAnswer(_, bodyPartMap, _) =>
-      val bodyPartAndFeelings = for {
-        (bodyPartString, feelings) <- bodyPartMap
-        bodyPart = nameToBodyPart(bodyPartString)
-      } yield (bodyPart, feelings)
-      selectedBodyParts.clear()
-      selectedBodyParts ++ bodyPartAndFeelings
-      drawAllParts()
-      getView.invalidate()
-  }
-
-  override def getAnswerFromView: Option[Answer] = {
-    val values = selectedBodyParts.map{
-      case (bodyPart, answerList) =>
-        (bodyPartToName(bodyPart), answerList.map(_.toString))
-    }.mapValues(_.toList).toMap
-    Some(BodyAnswer("body_uuid", values))
   }
 }

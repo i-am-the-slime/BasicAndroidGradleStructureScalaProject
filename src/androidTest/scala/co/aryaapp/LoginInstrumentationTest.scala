@@ -1,14 +1,14 @@
 package co.aryaapp
 
-import android.graphics.drawable.ColorDrawable
-import android.test._
-import android.test.suitebuilder.annotation.MediumTest
-import android.view.KeyEvent
-import co.aryaapp.onboarding.Login
-import org.scalatest.{FlatSpec, Matchers}
-import org.scalatest.junit.{JUnitRunner, ShouldMatchersForJUnit, AssertionsForJUnit}
-import co.aryaapp.helpers.AndroidConversions._
-import TypedResource._
+//import android.graphics.drawable.ColorDrawable
+//import android.test._
+//import android.test.suitebuilder.annotation.MediumTest
+//import android.view.KeyEvent
+//import co.aryaapp.onboarding.Login
+//import org.scalatest.{FlatSpec, Matchers}
+//import org.scalatest.junit.{JUnitRunner, ShouldMatchersForJUnit, AssertionsForJUnit}
+//import co.aryaapp.helpers.AndroidConversions._
+//import TypedResource._
 
 //class LoginInstrumentationTest extends ActivityInstrumentationTestCase2[Login](classOf[Login])
 //                with AssertionsForJUnit

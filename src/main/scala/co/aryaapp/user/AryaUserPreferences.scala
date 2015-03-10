@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.AsyncTask
 import android.preference.PreferenceManager
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 object AryaUserPreferences {
   val EMAIL = "email"
