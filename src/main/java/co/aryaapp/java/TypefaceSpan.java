@@ -1,4 +1,4 @@
-package co.aryaapp;
+package co.aryaapp.java;
 
 import android.content.Context;
 import android.graphics.Paint;

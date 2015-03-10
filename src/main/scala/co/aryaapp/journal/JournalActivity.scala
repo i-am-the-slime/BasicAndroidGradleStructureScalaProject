@@ -1,89 +1,161 @@
 package co.aryaapp.journal
 
 import android.os.Bundle
-import android.support.v4.view.ViewPager
+import android.support.v4.app.FragmentTransaction
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
-import co.aryaapp.{R, TR, TypedResource}
+import co.aryaapp.TypedResource._
+import co.aryaapp.helpers.AndroidConversions._
 import co.aryaapp.helpers._
-import language.postfixOps
-import TypedResource._
-import AndroidConversions._
+import co.aryaapp.journal.fragments._
+import co.aryaapp.{R, TR}
 
-import scala.concurrent.Future
+import scala.language.postfixOps
+import scalaz.syntax.std.option._
 
 class JournalActivity extends AryaBaseActivity with SlideIn with SlideOut{
-  lazy val pager = this.findView(TR.journalViewPager)
-  lazy val adapter = new JournalPagerAdapter(getSupportFragmentManager, pager.getId)
+  lazy val containerId = R.id.fragment_container
+  lazy val fragmentContainer = this.findView(TR.fragment_container)
   lazy val closeButton = this.findView(TR.closeButton)
   lazy val nextButton = this.findView(TR.nextButton)
   lazy val pixelsToMove = getScreenWidth - nextButtonDefaultX + nextButton.getWidth
-  var nextButtonDefaultX = 0.0f
-
-  override def onBackPressed() = {
-    if(isTherePreviousPagerItem(pager, adapter)){
-      goToPreviousPagerItem(pager, adapter)
-    } else {
-        finish()
-    }
-  }
-  
-  def animateNextButtonIn() = {
-    animateNextButton( (deltaX: Float, duration:Int) =>
-      Animations.moveInFromRight(deltaX, duration, 0)
-    )
-  }
-
-  private def animateNextButton(animation:(Float, Int) => Animation) = {
-    val anim = animation(pixelsToMove, 500)
-    anim.setFillAfter(true)
-    nextButton.startAnimation(anim)
-
-  }
-  
-  def animateNextButtonOut() = {
-    animateNextButton( (deltaX:Float, duration:Int) =>
-      Animations.moveOutToRight(deltaX, duration, 0)
-    )
-  }
+  var nextButtonDefaultX = 0f
+  lazy val pages = Array(
+    () ⇒  new HowAreYouFeelingFragment,
+    () ⇒  new WhatHappenedFragment,
+    () ⇒  new HowDidYouReactFragment,
+    () ⇒  new HowDidYourBodyReactFragment,
+    () ⇒  new WhatAreYouThinkingFragment
+    () ⇒ new DoneFragment) //TODO Add done fragment
+  def currentPosition = getSupportFragmentManager.getFragments.get(0).getTag.toInt
 
   override def onCreate(savedInstanceState: Bundle) = {
     super.onCreate(savedInstanceState)
     //Setup View Pager for the fragments and its adapter
-    setContentView(R.layout.activity_journal_frame)
-    pager.setAdapter(adapter)
-    nextButton.setOnClickListener((v:View) => {Log.e("MOTHER", "Btn clicked") ;goToNextPagerItem(pager, adapter)})
+    setContentView(R.layout.activity_journal)
+    nextButton.setOnClickListener((_:View) => goToNextPagerItem())
     nextButtonDefaultX = nextButton.getX
-    closeButton.setOnClickListener((v: View) => finish())
+    closeButton.setOnClickListener((_: View) => finish())
+    val baseFrag = pages(0)()
+    getSupportFragmentManager.beginTransaction().add(containerId, baseFrag, "0").commit()
+    ()
   }
 
-  def goToNextPagerItem(pager:ViewPager, adapter:JournalPagerAdapter) = {
+  override def onBackPressed() = {
+    val hasGoneBack = goToPreviousPagerItem()
+    if( !hasGoneBack ) finish()
+  }
 
-    if(pager.getCurrentItem == (adapter.getCount - 2)){
-      animateNextButtonOut()
+  sealed trait PositionTransition{ def before:Int; def after:Int }
+  case class BackwardsTransition(before:Int, after:Int) extends PositionTransition
+  case class ForwardsTransition(before:Int, after:Int) extends PositionTransition
+  case class NoTransition(position:Int) extends PositionTransition {
+    override def before = position
+    override def after = position
+  }
+
+  def titleForFragment(frag:JournalBaseFragment):String = {
+    getResources.getString(frag.title)
+  }
+
+  def setCurrentItemFromPosition(positionTransition:PositionTransition):Boolean = {
+    def transaction(pos:Int) = {
+      val frag = pages(pos)()
+      getSupportFragmentManager.beginTransaction().replace(containerId, frag, String.valueOf(pos))
     }
-
-    if(isThereNextPagerItem(pager, adapter))
-      pager.setCurrentItem(pager.getCurrentItem + 1, true)
-  }
-
-  def goToPreviousPagerItem(pager:ViewPager, adapter:JournalPagerAdapter) = {
-
-    if(pager.getCurrentItem == (adapter.getCount - 1)) {
-      animateNextButtonIn()
+    val transactionOpt:Option[FragmentTransaction] = positionTransition match {
+      case ForwardsTransition(_, after) ⇒
+        transaction(after).some
+      case BackwardsTransition(_, after) ⇒
+        transaction(after).some
+      case _ ⇒ None
     }
+    for(ta ← transactionOpt) ta.commit()
+    transactionOpt.isDefined
+  }
 
-    if(isTherePreviousPagerItem(pager, adapter)) {
-      pager.setCurrentItem(pager.getCurrentItem - 1, true)
+  def goToNextPagerItem():Boolean = {
+    val positionTransition:PositionTransition =
+      currentPosition match {
+        case pos if (pos >= 0) && (pos < pages.length-1) ⇒
+          ForwardsTransition(pos, pos + 1)
+        case pos ⇒ NoTransition(pos)
+      }
+    setCurrentItemFromPosition(positionTransition)
+  }
+
+  def goToPreviousPagerItem():Boolean = {
+    val positionTransition:PositionTransition =
+      currentPosition match {
+        case pos if (pos > 0) && (pos < pages.length) ⇒
+          BackwardsTransition(pos, pos - 1)
+        case pos ⇒ NoTransition(pos)
+      }
+    setCurrentItemFromPosition(positionTransition)
+  }
+
+  def animateNextButtonIn() = {
+    animateNextButton( (deltaX: Float, duration:Long) ⇒
+      Animations.moveInFromRight(deltaX, duration, 0)
+    )
+  }
+
+  private def animateNextButton(animation:(Float, Long) ⇒  Animation) = {
+    val anim = animation(pixelsToMove, 500)
+    anim.setFillAfter(true)
+    nextButton.startAnimation(anim)
+  }
+  
+  def animateNextButtonOut() = {
+    animateNextButton( (deltaX:Float, duration:Long) ⇒
+      Animations.moveOutToRight(deltaX, duration, 0)
+    )
+  }
+
+
+  /*
+    override def destroyItem(container: ViewGroup, position: Int, frag: scala.Any): Unit = {
+    val f = frag.asInstanceOf[JournalBaseFragment]
+    updateAnswersFromFragment(f, position)
+    super.destroyItem(container, position, frag)
+  }
+
+  def updateAnswersFromFragment(f:JournalBaseFragment, position:Int) = {
+   val answer = f.getAnswerFromView
+   answer.foreach( a => answers = answers + (position -> a))
+  }
+
+  var answers = Map[Int, Answer]()
+
+  def saveJournals():TestJournal = {
+    for{
+      position <- 0 until getCount-1
+      frag <- findFragmentByPosition(position) if frag != null
+    } updateAnswersFromFragment(frag, position)
+    val theAnswers = answers.values
+    val answer = TestJournal(theAnswers.toList)
+    answer
+  }
+
+  def findFragmentByPosition(position:Int):Try[JournalBaseFragment] = {
+    val itemId = getItemId(position)
+    Try(fm.findFragmentByTag("android:switcher:"+"viewPagerId"+":"+itemId).asInstanceOf[JournalBaseFragment])
+  }
+
+  override def getCount: Int = 6
+
+  override def getItem(position: Int): Fragment = {
+    val frag = position match {
+      case 0 => new HowAreYouFeelingFragment
+      case 1 => new WhatHappenedFragment
+      case 2 => new HowDidYouReactFragment
+      case 3 => new HowDidYourBodyReactFragment
+      case 4 => new WhatAreYouThinkingFragment
+      case 5 => new DoneFragment(this)
     }
+    answers.get(position).foreach(frag.populateViewFromAnswer)
+    frag
   }
-
-  def isThereNextPagerItem(pager:ViewPager, adapter:JournalPagerAdapter):Boolean = {
-    pager.getCurrentItem < (adapter.getCount - 1)
-  }
-
-  def isTherePreviousPagerItem(pager:ViewPager, adapter:JournalPagerAdapter):Boolean = {
-    pager.getCurrentItem > 0
-  }
+   */
 }

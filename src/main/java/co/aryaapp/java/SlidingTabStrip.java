@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package co.aryaapp;
+package co.aryaapp.java;
 
 import android.content.Context;
 import android.graphics.Canvas;
