@@ -1,6 +1,7 @@
 package co.aryaapp.journal.fragments
 
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.widget.{CheckedTextView, SeekBar}
 import co.aryaapp.R
 import co.aryaapp.journal.JournalBaseFragment
@@ -16,7 +17,6 @@ trait ListAnswer extends JournalBaseFragment {
 
   @argonaut case class ListAnswer(questionId:String, answer:List[String])
 
-  val listItems:collection.mutable.Stack[String]
   def addListItem(item:String):Unit
   def recyclerView:RecyclerView
 
@@ -27,12 +27,13 @@ trait ListAnswer extends JournalBaseFragment {
   }
 
   override def getAnswerFromView: Option[String] = {
-    val values = for{
+    val values = for {
       index <- 0 until recyclerView.getChildCount
-      child = recyclerView.getChildAt(index) if child.getId == R.id.what_happened_item_checkbox
-      checkedTV:CheckedTextView = child.asInstanceOf[CheckedTextView] if child.isActivated
+      child = recyclerView.getChildAt(index)
+      cb = child.findViewById(R.id.what_happened_item_checkbox)
+      checkedTV:CheckedTextView = cb.asInstanceOf[CheckedTextView] if checkedTV.isChecked
     } yield checkedTV.getText.toString
-    Some(ListAnswer("dont know the uuid", values.toList).asJson.nospaces)
+    Some(ListAnswer("ListAnswer", values.toList).asJson.nospaces)
   }
 
   }

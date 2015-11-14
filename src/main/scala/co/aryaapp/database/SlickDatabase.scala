@@ -3,7 +3,8 @@ package co.aryaapp.database
 import android.content.Context
 import argonaut.Argonaut._
 import co.aryaapp.communication.DataTypes.{Journal, JournalEntry}
-
+import org.joda.time.{LocalDateTime, DateTime}
+import com.github.tototoshi.slick.SQLiteJodaSupport._
 import scala.slick.driver.SQLiteDriver.simple._
 import scala.slick.jdbc.meta.MTable
 
@@ -11,6 +12,27 @@ class SlickDatabase(implicit ctx:Context) {
   val Driver = "org.sqldroid.SQLDroidDriver"
   val keepThis = Class.forName(Driver).newInstance()
   lazy val db = Database.forURL("jdbc:sqlite:" + ctx.getApplicationContext.getFilesDir + "/db.txt", driver = Driver)
+
+  /**
+   * Answers
+   */
+  val AnswersTableName = "ANSWERS"
+  class AnswersTable(tag:Tag) extends Table[(String, DateTime)](tag, AnswersTableName){
+    def json = column[String]("json", O.NotNull)
+    def date = column[DateTime]("date", O.NotNull)
+    def * = (json, date)
+  }
+  val answers = TableQuery[AnswersTable]
+
+  def addAnswers(as:List[String]):Unit = {
+    db withTransaction {
+      implicit session =>
+        val date = DateTime.now()
+        answers += ((as.asJson.nospaces, date))
+    }
+    ()
+  }
+
 
   /**
    * Journals
@@ -26,7 +48,7 @@ class SlickDatabase(implicit ctx:Context) {
 
   def addJournal(journal:Journal) : Unit = {
     db withTransaction { implicit session =>
-      val journalUuid= JournalUUID(journal.uuid)
+      val journalUuid = JournalUUID(journal.uuid)
       if( !journals.filter(_.uuid === journalUuid).exists.run ) {
         journals += ((journalUuid, journal.asJson.nospaces))
       }
@@ -82,7 +104,7 @@ class SlickDatabase(implicit ctx:Context) {
 
   /* Create any tables that don't exist yet */
   db withSession {
-    val ddl = journals.ddl ++ journalEntries.ddl
+    val ddl = answers.ddl ++ journals.ddl ++ journalEntries.ddl
     implicit session ⇒ {
       if (MTable.getTables(JournalsTableName).list.isEmpty){
         ddl.create

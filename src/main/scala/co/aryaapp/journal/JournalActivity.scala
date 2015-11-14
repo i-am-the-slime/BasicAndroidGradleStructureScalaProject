@@ -7,6 +7,7 @@ import android.view.View
 import android.view.animation.Animation
 import co.aryaapp.TypedResource._
 import co.aryaapp.communication.DataTypes.{Journal, JournalPage}
+import co.aryaapp.database.{SlickDatabase, AryaDB}
 import co.aryaapp.helpers.AndroidConversions._
 import co.aryaapp.helpers._
 import co.aryaapp.java.MaterialMenuDrawable
@@ -35,12 +36,21 @@ class JournalActivity extends AryaBaseActivity with SlideIn with SlideOut{
     () ⇒ new HowDidYouReactFragment,
     () ⇒ new HowDidYourBodyReactFragment,
     () ⇒ new WhatAreYouThinkingFragment,
-    () ⇒ new DoneFragment ) //TODO Add done fragment
+    () ⇒ new DoneFragment )
+
   def currentFragment:JournalBaseFragment = getSupportFragmentManager.getFragments.get(0).asInstanceOf[JournalBaseFragment]
   def currentPosition = currentFragment.getTag.toInt
 
+  override def onSaveInstanceState(outState: Bundle): Unit = {
+    //TODO: Store JSON of questions/pages
+    //TODO: Store their respective answers
+    super.onSaveInstanceState(outState)
+  }
+
   override def onCreate(savedInstanceState: Bundle) = {
     super.onCreate(savedInstanceState)
+    //TODO: Get the questions from the saved instance state
+    //TODO: Get their answers
     //Setup View Pager for the fragments and its adapter
     setContentView(R.layout.activity_journal)
     closeButton.setOnClickListener((_: View) ⇒ finish())
@@ -66,9 +76,13 @@ class JournalActivity extends AryaBaseActivity with SlideIn with SlideOut{
     val frag = currentFragment
     for ((k, v) ← answers) Log.e("Mother", s"key: $k  value: $v")
     pos match {
-      case last if last == (pages.size - 1) ⇒
-//        Journal("abcdefg", "now", "now", List(JournalPage("abcd", "title", "subtitle")))
-      case p if p < (pages.size - 1) ⇒
+      case last if last == (pages.length - 1) ⇒
+        val db = new SlickDatabase()
+        db.addAnswers(answers.values.toList)
+//        TODO: Maybe trigger sending it to the Server or handle that in the DB
+        finish()
+
+      case p if p < (pages.length - 1) ⇒
         for (answer ← frag.getAnswerFromView) {
           answers = answers.updated(pos, answer)
         }

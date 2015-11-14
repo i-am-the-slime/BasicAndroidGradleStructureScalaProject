@@ -9,7 +9,7 @@ name := "arya"
 
 platformTarget in Android := "android-21"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.6"
 
 mergeManifests in Android := false
 
